@@ -1,0 +1,41 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  order_state: 1
+  delivery_type: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: 2014-11-04
+  departure_date: 2014-11-04
+  language: MyText
+  num_phones: 1
+  fedex_out_code: MyText
+  fedex_return_code: MyText
+  customer_id: 
+  phone_id: 
+
+two:
+  order_state: 1
+  delivery_type: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: 2014-11-04
+  departure_date: 2014-11-04
+  language: MyText
+  num_phones: 1
+  fedex_out_code: MyText
+  fedex_return_code: MyText
+  customer_id: 
+  phone_id: 

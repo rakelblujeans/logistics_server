@@ -1,0 +1,84 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Bt trans:</strong>
+  <%= @order_payment.bt_trans_id %>
+</p>
+
+<p>
+  <strong>Discount code:</strong>
+  <%= @order_payment.discount_code %>
+</p>
+
+<p>
+  <strong>Shipping string:</strong>
+  <%= @order_payment.shipping_string %>
+</p>
+
+<p>
+  <strong>Referral code:</strong>
+  <%= @order_payment.referral_code %>
+</p>
+
+<p>
+  <strong>Rental charge:</strong>
+  <%= @order_payment.rental_charge %>
+</p>
+
+<p>
+  <strong>Shipping charge:</strong>
+  <%= @order_payment.shipping_charge %>
+</p>
+
+<p>
+  <strong>Rental discount:</strong>
+  <%= @order_payment.rental_discount %>
+</p>
+
+<p>
+  <strong>Tax charge:</strong>
+  <%= @order_payment.tax_charge %>
+</p>
+
+<p>
+  <strong>Payment amount:</strong>
+  <%= @order_payment.payment_amount %>
+</p>
+
+<p>
+  <strong>Payment date:</strong>
+  <%= @order_payment.payment_date %>
+</p>
+
+<p>
+  <strong>Payment status:</strong>
+  <%= @order_payment.payment_status %>
+</p>
+
+<p>
+  <strong>Discount string:</strong>
+  <%= @order_payment.discount_string %>
+</p>
+
+<p>
+  <strong>Last 4 digits:</strong>
+  <%= @order_payment.last_4_digits %>
+</p>
+
+<p>
+  <strong>Refunded:</strong>
+  <%= @order_payment.refunded %>
+</p>
+
+<p>
+  <strong>Order:</strong>
+  <%= @order_payment.order %>
+</p>
+
+<p>
+  <strong>Credit card:</strong>
+  <%= @order_payment.credit_card %>
+</p>
+
+<%= link_to 'Edit', edit_order_payment_path(@order_payment) %> |
+<%= link_to 'Back', order_payments_path %>

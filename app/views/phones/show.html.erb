@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Inventory:</strong>
+  <%= @phone.inventory_id %>
+</p>
+
+<p>
+  <strong>Meid:</strong>
+  <%= @phone.MEID %>
+</p>
+
+<p>
+  <strong>Iccid:</strong>
+  <%= @phone.ICCID %>
+</p>
+
+<p>
+  <strong>Phone num:</strong>
+  <%= @phone.phone_num %>
+</p>
+
+<p>
+  <strong>Notes:</strong>
+  <%= @phone.notes %>
+</p>
+
+<p>
+  <strong>Last imaged:</strong>
+  <%= @phone.last_imaged %>
+</p>
+
+<p>
+  <strong>Provider:</strong>
+  <%= @phone.provider %>
+</p>
+
+<%= link_to 'Edit', edit_phone_path(@phone) %> |
+<%= link_to 'Back', phones_path %>
