@@ -1,5 +1,6 @@
 class ProvidersController < ApplicationController
   before_action :set_provider, only: [:show, :edit, :update, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => [:update]
 
   # GET /providers
   # GET /providers.json

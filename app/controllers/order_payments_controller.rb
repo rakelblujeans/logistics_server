@@ -1,5 +1,6 @@
 class OrderPaymentsController < ApplicationController
   before_action :set_order_payment, only: [:show, :edit, :update, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => [:update]
 
   # GET /order_payments
   # GET /order_payments.json

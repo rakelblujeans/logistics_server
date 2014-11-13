@@ -1,5 +1,6 @@
 class OrderStatesController < ApplicationController
   before_action :set_order_state, only: [:show, :edit, :update, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => [:update]
 
   # GET /order_states
   # GET /order_states.json
