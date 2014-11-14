@@ -1,5 +1,7 @@
 class Order < ActiveRecord::Base
   belongs_to :customer
-  belongs_to :phone
-  has_one :order_payment
+  has_many :shipments
+  has_many :phones, through: :shipments
+  has_many :receipts
+  has_many :event_logs
 end

@@ -1,6 +1,5 @@
 class CreditCardsController < ApplicationController
   before_action :set_credit_card, only: [:show, :edit, :update, :destroy]
-  skip_before_filter :verify_authenticity_token, :only => [:update]
 
   # GET /credit_cards
   # GET /credit_cards.json
@@ -70,6 +69,6 @@ class CreditCardsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def credit_card_params
-      params.require(:credit_card).permit(:active, :last4, :bt_id, :customer_id)
+      params.require(:credit_card).permit(:active, :last4, :bt_id)
     end
 end

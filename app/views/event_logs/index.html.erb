@@ -1,0 +1,23 @@
+<h1>Listing event_logs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @event_logs.each do |event_log| %>
+      <tr>
+        <td><%= link_to 'Show', event_log %></td>
+        <td><%= link_to 'Edit', edit_event_log_path(event_log) %></td>
+        <td><%= link_to 'Destroy', event_log, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Event log', new_event_log_path %>

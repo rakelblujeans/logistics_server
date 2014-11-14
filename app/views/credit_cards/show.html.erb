@@ -1,24 +1,4 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Active:</strong>
-  <%= @credit_card.active %>
-</p>
-
-<p>
-  <strong>Last4:</strong>
-  <%= @credit_card.last4 %>
-</p>
-
-<p>
-  <strong>Bt:</strong>
-  <%= @credit_card.bt_id %>
-</p>
-
-<p>
-  <strong>Customer:</strong>
-  <%= @credit_card.customer %>
-</p>
-
 <%= link_to 'Edit', edit_credit_card_path(@credit_card) %> |
 <%= link_to 'Back', credit_cards_path %>

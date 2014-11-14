@@ -1,0 +1,23 @@
+<h1>Listing delivery_types</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @delivery_types.each do |delivery_type| %>
+      <tr>
+        <td><%= link_to 'Show', delivery_type %></td>
+        <td><%= link_to 'Edit', edit_delivery_type_path(delivery_type) %></td>
+        <td><%= link_to 'Destroy', delivery_type, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Delivery type', new_delivery_type_path %>

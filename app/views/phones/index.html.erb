@@ -3,13 +3,6 @@
 <table>
   <thead>
     <tr>
-      <th>Inventory</th>
-      <th>Meid</th>
-      <th>Iccid</th>
-      <th>Phone num</th>
-      <th>Notes</th>
-      <th>Last imaged</th>
-      <th>Provider</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -17,13 +10,6 @@
   <tbody>
     <% @phones.each do |phone| %>
       <tr>
-        <td><%= phone.inventory_id %></td>
-        <td><%= phone.MEID %></td>
-        <td><%= phone.ICCID %></td>
-        <td><%= phone.phone_num %></td>
-        <td><%= phone.notes %></td>
-        <td><%= phone.last_imaged %></td>
-        <td><%= phone.provider %></td>
         <td><%= link_to 'Show', phone %></td>
         <td><%= link_to 'Edit', edit_phone_path(phone) %></td>
         <td><%= link_to 'Destroy', phone, method: :delete, data: { confirm: 'Are you sure?' } %></td>

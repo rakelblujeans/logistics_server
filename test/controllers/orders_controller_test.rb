@@ -18,7 +18,7 @@ class OrdersControllerTest < ActionController::TestCase
 
   test "should create order" do
     assert_difference('Order.count') do
-      post :create, order: { arrival_date: @order.arrival_date, customer_id: @order.customer_id, delivery_type: @order.delivery_type, departure_date: @order.departure_date, fedex_out_code: @order.fedex_out_code, fedex_return_code: @order.fedex_return_code, full_address: @order.full_address, language: @order.language, num_phones: @order.num_phones, order_state: @order.order_state, phone_id: @order.phone_id, shipping_apt_suite: @order.shipping_apt_suite, shipping_city: @order.shipping_city, shipping_country: @order.shipping_country, shipping_name: @order.shipping_name, shipping_notes: @order.shipping_notes, shipping_state: @order.shipping_state, shipping_zip: @order.shipping_zip }
+      post :create, order: {  }
     end
 
     assert_redirected_to order_path(assigns(:order))
@@ -35,7 +35,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "should update order" do
-    patch :update, id: @order, order: { arrival_date: @order.arrival_date, customer_id: @order.customer_id, delivery_type: @order.delivery_type, departure_date: @order.departure_date, fedex_out_code: @order.fedex_out_code, fedex_return_code: @order.fedex_return_code, full_address: @order.full_address, language: @order.language, num_phones: @order.num_phones, order_state: @order.order_state, phone_id: @order.phone_id, shipping_apt_suite: @order.shipping_apt_suite, shipping_city: @order.shipping_city, shipping_country: @order.shipping_country, shipping_name: @order.shipping_name, shipping_notes: @order.shipping_notes, shipping_state: @order.shipping_state, shipping_zip: @order.shipping_zip }
+    patch :update, id: @order, order: {  }
     assert_redirected_to order_path(assigns(:order))
   end
 

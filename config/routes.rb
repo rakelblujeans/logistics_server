@@ -3,18 +3,24 @@ Rails.application.routes.draw do
 
   get 'home/index'
 
-  resources :order_states
-
-  resources :orders
+  resources :credit_cards
 
   resources :customers
 
-  resources :order_payments
+  resources :delivery_types
 
-  resources :credit_cards
+  resources :event_logs
+
+  resources :orders
 
   resources :phones
 
+  resources :providers
+
+  resources :receipts
+
+  resources :shipments
+  
   match '*any' => 'application#options', :via => [:options]
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -63,11 +63,8 @@ phones = Phone.create([
 
 c1 = Customer.create({fname: 'test1_first', lname: 'test1_last', email: 'test@gmail.com'});
 
-card1 = CreditCard.create({active: true, last4:'1234', bt_id: 'X123Z02', customer: c1});
-
 order1 = Order.create({
-	order_state: 'pending', 
-	delivery_type: 'residential',
+	delivery_type_str: 'residential',
 	full_address: '123 Main St',
 	shipping_name: 'first last',
 	shipping_city: 'new york',
@@ -80,14 +77,39 @@ order1 = Order.create({
 	departure_date: '2015-01-01',
 	language: 'en',
 	num_phones: 1,
-	fedex_out_code: '123XYZ',
-	fedex_return_code: '456QWE',
-	customer: c1,
-	phone: phones[0]
+	customer: c1
 	});
 
+dt1 = DeliveryType.create({name: 'Fedex'});
+dt2 = DeliveryType.create({name: 'UPS'});
+dt3 = DeliveryType.create({name: 'By hand'});
 
-receipt = OrderPayment.create({
+shipment = Shipment.create({
+	fedex_out_code: '123XYZ',
+	fedex_return_code: '456QWE',
+	qty: 2,
+	order: order1,
+	delivery_type: dt1,
+	customer: c1,
+	});
+
+EventLog.create({
+	customer: c1,
+	order: order1,
+	description: "order received"
+	});
+
+EventLog.create({
+	customer: c1,
+	order: order1,
+	description: "order shipped"
+	});
+
+#shipment.phones << phones[0];
+
+card1 = CreditCard.create({active: true, last4:'1234', bt_id: 'X123Z02', customer: c1});
+
+receipt = Receipt.create({
 	bt_trans_id: '123XYZ',
 	discount_code: '15teen',
 	shipping_string: '123 Main St, Brooklynm, NY 12345',
@@ -105,4 +127,3 @@ receipt = OrderPayment.create({
 	order: order1,
 	credit_card: card1
 	});
-

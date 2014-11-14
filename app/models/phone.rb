@@ -1,4 +1,5 @@
 class Phone < ActiveRecord::Base
-  has_many :orders
   belongs_to :provider
+  has_many :shipments
+  has_many :orders, through: :shipments
 end

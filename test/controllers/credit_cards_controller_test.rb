@@ -18,7 +18,7 @@ class CreditCardsControllerTest < ActionController::TestCase
 
   test "should create credit_card" do
     assert_difference('CreditCard.count') do
-      post :create, credit_card: { active: @credit_card.active, bt_id: @credit_card.bt_id, customer_id: @credit_card.customer_id, last4: @credit_card.last4 }
+      post :create, credit_card: {  }
     end
 
     assert_redirected_to credit_card_path(assigns(:credit_card))
@@ -35,7 +35,7 @@ class CreditCardsControllerTest < ActionController::TestCase
   end
 
   test "should update credit_card" do
-    patch :update, id: @credit_card, credit_card: { active: @credit_card.active, bt_id: @credit_card.bt_id, customer_id: @credit_card.customer_id, last4: @credit_card.last4 }
+    patch :update, id: @credit_card, credit_card: {  }
     assert_redirected_to credit_card_path(assigns(:credit_card))
   end
 
