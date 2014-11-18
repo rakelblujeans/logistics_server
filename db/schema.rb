@@ -14,9 +14,9 @@
 ActiveRecord::Schema.define(version: 20141103213809) do
 
   create_table "credit_cards", force: true do |t|
-    t.boolean  "active"
     t.string   "last4"
     t.string   "bt_id"
+    t.boolean  "active"
     t.integer  "customer_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -29,6 +29,8 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.text     "fname"
     t.text     "lname"
     t.text     "email"
+    t.text     "bt_id"
+    t.boolean  "active"
     t.integer  "shipments_id"
     t.integer  "credit_cards_id"
     t.integer  "event_logs_id"
@@ -53,6 +55,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.integer  "customer_id"
     t.integer  "order_id"
     t.text     "description"
+    t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -71,6 +74,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.date     "departure_date"
     t.text     "language"
     t.integer  "num_phones"
+    t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "customer_id"
@@ -88,6 +92,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.text     "phone_num"
     t.text     "notes"
     t.date     "last_imaged"
+    t.boolean  "active"
     t.integer  "provider_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -103,6 +108,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
 
   create_table "providers", force: true do |t|
     t.text     "name"
+    t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "phones_id"
@@ -125,6 +131,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.text     "discount_string"
     t.text     "last_4_digits"
     t.boolean  "refunded"
+    t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "order_id"
@@ -135,6 +142,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.text     "fedex_out_code"
     t.text     "fedex_return_code"
     t.integer  "qty"
+    t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "order_id"

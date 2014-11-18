@@ -70,6 +70,6 @@ class ReceiptsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def receipt_params
       params[:receipt]
-      params.require(:receipt).permit(:bt_trans_id, :discount_code, :shipping_string, :referral_code, :rental_charge, :shipping_charge, :rental_discount, :tax_charge, :payment_amount, :payment_date, :payment_status, :discount_string, :last_4_digits, :refunded)
+      params.require(:receipt).permit(:active, :bt_trans_id, :discount_code, :shipping_string, :referral_code, :rental_charge, :shipping_charge, :rental_discount, :tax_charge, :payment_amount, :payment_date, :payment_status, :discount_string, :last_4_digits, :refunded)
     end
 end

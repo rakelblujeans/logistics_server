@@ -4,6 +4,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
     # AT&T, Sprint, etc
     create_table :providers do |t|
       t.text :name
+      t.boolean :active
       t.timestamps
       t.references :phones, index: true
     end
@@ -15,6 +16,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.text :phone_num
       t.text :notes
       t.date :last_imaged
+      t.boolean :active
       t.belongs_to :provider
       t.timestamps
     end
@@ -23,6 +25,8 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.text :fname
       t.text :lname
       t.text :email
+      t.text :bt_id
+      t.boolean :active
       t.references :shipments, index: true
       t.references :credit_cards, index: true
       t.references :event_logs, index: true
@@ -44,6 +48,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.date :departure_date
       t.text :language
       t.integer :num_phones
+      t.boolean :active
       t.timestamps
       t.belongs_to :customer
       t.references :shipments, index: true
@@ -61,6 +66,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.text :fedex_out_code
       t.text :fedex_return_code
       t.integer :qty
+      t.boolean :active
       t.timestamps
       t.belongs_to :order
       t.belongs_to :delivery_type
@@ -77,13 +83,14 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.belongs_to :customer
       t.belongs_to :order
       t.text  :description
+      t.boolean :active
       t.timestamps
     end
 
     create_table :credit_cards do |t|
-      t.boolean :active
       t.string :last4
       t.string :bt_id
+      t.boolean :active
       t.belongs_to :customer
       t.timestamps
       t.references :receipts, index: true
@@ -104,6 +111,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.text :discount_string
       t.text :last_4_digits
       t.boolean :refunded
+      t.boolean :active
       t.timestamps
       t.belongs_to :order
       t.belongs_to :credit_card

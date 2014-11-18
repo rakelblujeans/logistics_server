@@ -70,6 +70,6 @@ class ShipmentsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def shipment_params
       params[:shipment]
-      params.require(:shipment).permit(:fedex_out_code, :fedex_return_code, :qty)
+      params.require(:shipment).permit(:active, :fedex_out_code, :fedex_return_code, :qty)
     end
 end

@@ -69,6 +69,7 @@ class PhonesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def phone_params
-      params.require(:phone).permit(:inventory_id, :MEID, :ICCID, :phone_num, :notes, :last_imaged, :provider_id)
+      params.require(:phone).permit(:active, :inventory_id, :MEID, :ICCID, :phone_num, 
+        :notes, :last_imaged, :provider_id)
     end
 end
