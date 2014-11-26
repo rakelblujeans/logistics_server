@@ -52,15 +52,23 @@ ActiveRecord::Schema.define(version: 20141103213809) do
   add_index "delivery_types", ["shipments_id"], name: "index_delivery_types_on_shipments_id"
 
   create_table "event_logs", force: true do |t|
-    t.integer  "customer_id"
-    t.integer  "order_id"
-    t.text     "description"
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "customer_id"
+    t.integer  "order_id"
+    t.integer  "event_state_id"
   end
 
+  create_table "event_states", force: true do |t|
+    t.text    "description"
+    t.integer "event_logs_id"
+  end
+
+  add_index "event_states", ["event_logs_id"], name: "index_event_states_on_event_logs_id"
+
   create_table "orders", force: true do |t|
+    t.text     "invoice_id"
     t.text     "delivery_type_str"
     t.text     "full_address"
     t.text     "shipping_name"
@@ -143,6 +151,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.text     "fedex_return_code"
     t.integer  "qty"
     t.boolean  "active"
+    t.date     "out_on_date"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "order_id"

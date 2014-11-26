@@ -68,6 +68,7 @@ c1 = Customer.create({
 	active: true});
 
 order1 = Order.create({
+	invoice_id: 'XYZ123',
 	delivery_type_str: 'residential',
 	full_address: '123 Main St',
 	shipping_name: 'first last',
@@ -77,8 +78,8 @@ order1 = Order.create({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-01-01',
-	departure_date: '2015-01-01',
+	arrival_date: '2014-12-10',
+	departure_date: '2014-12-14',
 	language: 'en',
 	num_phones: 1,
 	customer: c1,
@@ -96,24 +97,34 @@ shipment = Shipment.create({
 	order: order1,
 	delivery_type: dt1,
 	customer: c1,
-	active: true
+	active: true,
+	out_on_date: '2014-12-07'
 	});
 
-EventLog.create({
+event_states = EventState.create([
+	{ description: 'inventory added' },
+	{ description: 'out for delivery' },
+	{ description: 'received by customer' },
+	{ description: 'sent out by customer' },
+	{ description: 'received' },
+	{ description: 'lost or stolen' },
+	{ description: 'removed from inventory' },
+	{ description: 'temporarily disabled' },
+	]);
+
+log1 = EventLog.create({
 	customer: c1,
 	order: order1,
-	description: "order received",
+	event_state: event_states[1],
 	active: true
 	});
 
-EventLog.create({
+log2 = EventLog.create({
 	customer: c1,
 	order: order1,
-	description: "order shipped",
+	event_state: event_states[2],
 	active: true
 	});
-
-#shipment.phones << phones[0];
 
 card1 = CreditCard.create({last4:'1234', bt_id: 'X123Z02', customer: c1, active: true});
 

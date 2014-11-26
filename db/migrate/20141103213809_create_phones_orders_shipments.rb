@@ -35,6 +35,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
 
     # as it comes in from external source (website)
     create_table :orders do |t|
+      t.text :invoice_id
       t.text :delivery_type_str
       t.text :full_address
       t.text :shipping_name
@@ -67,6 +68,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.text :fedex_return_code
       t.integer :qty
       t.boolean :active
+      t.date :out_on_date
       t.timestamps
       t.belongs_to :order
       t.belongs_to :delivery_type
@@ -79,12 +81,17 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.index :shipment_id
     end
 
+    create_table :event_states do |t|
+      t.text :description
+      t.references :event_logs, index: true
+    end
+
     create_table :event_logs do |t|
-      t.belongs_to :customer
-      t.belongs_to :order
-      t.text  :description
       t.boolean :active
       t.timestamps
+      t.belongs_to :customer
+      t.belongs_to :order
+      t.belongs_to :event_state
     end
 
     create_table :credit_cards do |t|
