@@ -12,6 +12,11 @@ class OrdersController < ApplicationController
   def show
   end
 
+  # GET /orders/unmatched
+  def unmatched
+    @orders = Order.unmatched
+  end
+
   # GET /orders/new
   def new
     @order = Order.new

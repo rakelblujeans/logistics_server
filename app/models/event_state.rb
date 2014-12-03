@@ -1,3 +1,3 @@
 class EventState < ActiveRecord::Base
-  belongs_to :event_logs
+  has_many :events
 end

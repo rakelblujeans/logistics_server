@@ -33,13 +33,13 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.boolean  "active"
     t.integer  "shipments_id"
     t.integer  "credit_cards_id"
-    t.integer  "event_logs_id"
+    t.integer  "events_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "customers", ["credit_cards_id"], name: "index_customers_on_credit_cards_id"
-  add_index "customers", ["event_logs_id"], name: "index_customers_on_event_logs_id"
+  add_index "customers", ["events_id"], name: "index_customers_on_events_id"
   add_index "customers", ["shipments_id"], name: "index_customers_on_shipments_id"
 
   create_table "delivery_types", force: true do |t|
@@ -51,21 +51,25 @@ ActiveRecord::Schema.define(version: 20141103213809) do
 
   add_index "delivery_types", ["shipments_id"], name: "index_delivery_types_on_shipments_id"
 
-  create_table "event_logs", force: true do |t|
+  create_table "event_states", force: true do |t|
+    t.text "description"
+  end
+
+  create_table "events", force: true do |t|
+    t.integer  "customer_id"
+    t.integer  "order_id"
+    t.integer  "phone_id"
+    t.integer  "event_state_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "languages", force: true do |t|
+    t.text     "name"
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "customer_id"
-    t.integer  "order_id"
-    t.integer  "event_state_id"
   end
-
-  create_table "event_states", force: true do |t|
-    t.text    "description"
-    t.integer "event_logs_id"
-  end
-
-  add_index "event_states", ["event_logs_id"], name: "index_event_states_on_event_logs_id"
 
   create_table "orders", force: true do |t|
     t.text     "invoice_id"
@@ -88,8 +92,10 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.integer  "customer_id"
     t.integer  "shipments_id"
     t.integer  "receipts_id"
+    t.integer  "events_id"
   end
 
+  add_index "orders", ["events_id"], name: "index_orders_on_events_id"
   add_index "orders", ["receipts_id"], name: "index_orders_on_receipts_id"
   add_index "orders", ["shipments_id"], name: "index_orders_on_shipments_id"
 
@@ -102,9 +108,12 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.date     "last_imaged"
     t.boolean  "active"
     t.integer  "provider_id"
+    t.integer  "events_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "phones", ["events_id"], name: "index_phones_on_events_id"
 
   create_table "phones_shipments", id: false, force: true do |t|
     t.integer "phone_id",    null: false

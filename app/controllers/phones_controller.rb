@@ -28,6 +28,13 @@ class PhonesController < ApplicationController
 
     respond_to do |format|
       if @phone.save
+        # record event
+        @estate = EventState.where(description: "inventory added").first!
+        # TODO: catch errors
+         @event = Event.create(
+          :active => true,
+          :event_state => @estate
+          )
         format.html { redirect_to @phone, notice: 'Phone was successfully created.' }
         format.json { render :show, status: :created, location: @phone }
       else
@@ -65,6 +72,7 @@ class PhonesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_phone
       @phone = Phone.find(params[:id])
+      # @providers = Providers.all
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

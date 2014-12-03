@@ -1,6 +1,12 @@
 class CreatePhonesOrdersShipments < ActiveRecord::Migration
   def change
 
+    create_table :languages do |t|
+      t.text :name
+      t.boolean :active
+      t.timestamps
+    end
+
     # AT&T, Sprint, etc
     create_table :providers do |t|
       t.text :name
@@ -18,6 +24,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.date :last_imaged
       t.boolean :active
       t.belongs_to :provider
+      t.references :events, index: true
       t.timestamps
     end
 
@@ -29,7 +36,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.boolean :active
       t.references :shipments, index: true
       t.references :credit_cards, index: true
-      t.references :event_logs, index: true
+      t.references :events, index: true
       t.timestamps
     end
 
@@ -54,6 +61,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.belongs_to :customer
       t.references :shipments, index: true
       t.references :receipts, index: true
+      t.references :events, index: true
     end
 
     # UPS, Fedex, by hand, etc
@@ -83,15 +91,14 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
 
     create_table :event_states do |t|
       t.text :description
-      t.references :event_logs, index: true
     end
 
-    create_table :event_logs do |t|
-      t.boolean :active
-      t.timestamps
+    create_table :events do |t|
       t.belongs_to :customer
       t.belongs_to :order
+      t.belongs_to :phone
       t.belongs_to :event_state
+      t.timestamps
     end
 
     create_table :credit_cards do |t|

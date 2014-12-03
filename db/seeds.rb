@@ -11,6 +11,15 @@
 p1 = Provider.create({name: 'Sprint/Kajeet', active: true});
 p2 = Provider.create({name: 'AT&T', active: true});
 
+languages = Language.create([
+	{name: 'English'},
+	{name: 'French'},
+	{name: 'German'},
+	{name: 'Japanese'},
+	{name: 'Mandarin'},
+	{name: 'Spanish'}
+])
+
 phones = Phone.create([
 	{inventory_id: '01', MEID: '35823905652413', ICCID: '89011200000198262890', notes: "Raj's phone", last_imaged: '2014-10-01', provider:p1, active: true},
 	{inventory_id: '00', MEID: '352584060022552', notes: "Raquel's phone/Imaging", last_imaged: '2014-10-01', provider:p1, active: true},
@@ -86,6 +95,44 @@ order1 = Order.create({
 	active: true
 	});
 
+order2 = Order.create({
+	invoice_id: '456',
+	delivery_type_str: 'residential',
+	full_address: '123 Main St',
+	shipping_name: 'first last',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '12345',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: '2014-12-10',
+	departure_date: '2014-12-14',
+	language: 'en',
+	num_phones: 1,
+	customer: c1,
+	active: true
+	});
+
+order3 = Order.create({
+	invoice_id: '789',
+	delivery_type_str: 'residential',
+	full_address: '123 Main St',
+	shipping_name: 'first last',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '12345',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: '2014-12-10',
+	departure_date: '2014-12-14',
+	language: 'en',
+	num_phones: 1,
+	customer: c1,
+	active: true
+	});
+
 dt1 = DeliveryType.create({name: 'Fedex'});
 dt2 = DeliveryType.create({name: 'UPS'});
 dt3 = DeliveryType.create({name: 'By hand'});
@@ -103,6 +150,7 @@ shipment = Shipment.create({
 
 event_states = EventState.create([
 	{ description: 'inventory added' },
+	{ description: 'order received' },
 	{ description: 'out for delivery' },
 	{ description: 'received by customer' },
 	{ description: 'sent out by customer' },
@@ -112,18 +160,28 @@ event_states = EventState.create([
 	{ description: 'temporarily disabled' },
 	]);
 
-log1 = EventLog.create({
+event1 = Event.create({
 	customer: c1,
 	order: order1,
 	event_state: event_states[1],
-	active: true
 	});
 
-log2 = EventLog.create({
+event2 = Event.create({
 	customer: c1,
 	order: order1,
 	event_state: event_states[2],
-	active: true
+	});
+
+event3 = Event.create({
+	customer: c1,
+	order: order2,
+	event_state: event_states[1],
+	});
+
+event4 = Event.create({
+	customer: c1,
+	order: order3,
+	event_state: event_states[1],
 	});
 
 card1 = CreditCard.create({last4:'1234', bt_id: 'X123Z02', customer: c1, active: true});

@@ -9,8 +9,13 @@ Rails.application.routes.draw do
 
   resources :delivery_types
 
-  resources :event_logs
+  resources :events
 
+  resources :event_states
+
+  resources :languages
+
+  get 'orders/unmatched' => 'orders#unmatched'
   resources :orders
 
   resources :phones
@@ -37,6 +42,7 @@ Rails.application.routes.draw do
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
+
 
   # Example resource route with options:
   #   resources :products do
