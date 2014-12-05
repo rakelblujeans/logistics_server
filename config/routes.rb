@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   resources :delivery_types
 
+  post 'events/createMatched' => 'events#createMatched'
   resources :events
 
   resources :event_states
@@ -18,6 +19,9 @@ Rails.application.routes.draw do
   get 'orders/unmatched' => 'orders#unmatched'
   resources :orders
 
+  get 'phones/inventorySnapshot/:id'  => 'phones#inventorySnapshot'
+  get 'phones/assignedInventory/:id'  => 'phones#assignedInventory'
+  get 'phones/availableInventory'     => 'phones#availableInventory'
   resources :phones
 
   resources :providers

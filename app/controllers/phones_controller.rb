@@ -68,6 +68,22 @@ class PhonesController < ApplicationController
     end
   end
 
+  def availableInventory
+    #logger.debug("PARAMS #{params.inspect}")
+    @phones = Phone.availableInventory(params[:startDate], params[:endDate])
+    render "index"
+  end
+
+  def assignedInventory
+    @phones = Phone.assignedInventory(params[:id])
+    render "index"
+  end
+
+  def inventorySnapshot
+    @assignedInventory, @availableInventory = Phone.inventorySnapshot(params[:id])    
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_phone
@@ -78,6 +94,6 @@ class PhonesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def phone_params
       params.require(:phone).permit(:active, :inventory_id, :MEID, :ICCID, :phone_num, 
-        :notes, :last_imaged, :provider_id)
+        :notes, :last_imaged, :provider_id, :startDate, :endDate)
     end
 end

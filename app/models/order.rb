@@ -5,9 +5,10 @@ class Order < ActiveRecord::Base
   has_many :receipts
   has_many :events
 
-	# TODO: once you hit 1000 orders you will notice performance degradation here
+	# gets list of all unmatched orders
   def self.unmatched
-  	@state = EventState.where(description: "order received").first!
+    # TODO: once you hit 1000 orders you will notice performance degradation here
+  	@state = EventState.find_or_create_by(description: "order received")
     @ids = []
     #logger.warn "HELOOOOO: #{@state.valid?}"
     @events = Event.group(:order_id).having("max(events.created_at)")
@@ -19,6 +20,5 @@ class Order < ActiveRecord::Base
 
     @orders = Order.find(@ids)
   end
-
 
 end
