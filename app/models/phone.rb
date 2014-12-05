@@ -5,12 +5,12 @@ class Phone < ActiveRecord::Base
 
   # all inventory currently assigned to this order
   def self.assignedInventory(id)
-    @state = EventState.find_or_create_by(description: "order matched with inventory")
+    @state = EventState.matchedInventory
     @events = Event.select(:phone_id).where(
       order_id: id,
       event_state_id: @state.id
       ).order(:created_at)
-    
+    logger.debug "******* {#{@events.inspect}}"
     @used_phone_ids = []
     @events.each do |event|
       @used_phone_ids << event.phone_id
@@ -50,7 +50,7 @@ class Phone < ActiveRecord::Base
   # and what you have left to choose from
   def self.inventorySnapshot(id)
     @order = Order.where(id: id).first!;
-    logger.debug "#{@order.inspect}"
+    #logger.debug "#{@order.inspect}"
     @assigned = assignedInventory(id);
     @available = availableInventory(@order.arrival_date, @order.departure_date);
     return @assigned, @available

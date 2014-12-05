@@ -29,7 +29,7 @@ class PhonesController < ApplicationController
     respond_to do |format|
       if @phone.save
         # record event
-        @estate = EventState.where(description: "inventory added").first!
+        @estate = EventState.inventoryAdded
         # TODO: catch errors
          @event = Event.create(
           :active => true,
@@ -70,17 +70,18 @@ class PhonesController < ApplicationController
 
   def availableInventory
     #logger.debug("PARAMS #{params.inspect}")
-    @phones = Phone.availableInventory(params[:startDate], params[:endDate])
+    @phones = Phone.availableInventory(params[:start_date], params[:end_date])
     render "index"
   end
 
   def assignedInventory
-    @phones = Phone.assignedInventory(params[:id])
+    @phones = Phone.assignedInventory(params[:order_id])
     render "index"
   end
 
   def inventorySnapshot
-    @assignedInventory, @availableInventory = Phone.inventorySnapshot(params[:id])    
+    #logger.debug("PARAMS #{params.inspect}")
+    @assignedInventory, @availableInventory = Phone.inventorySnapshot(params[:order_id])    
   end
 
 
@@ -94,6 +95,6 @@ class PhonesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def phone_params
       params.require(:phone).permit(:active, :inventory_id, :MEID, :ICCID, :phone_num, 
-        :notes, :last_imaged, :provider_id, :startDate, :endDate)
+        :notes, :last_imaged, :provider_id, :start_date, :end_date, :phone_id, :order_id)
     end
 end
