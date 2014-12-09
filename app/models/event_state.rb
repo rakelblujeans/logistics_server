@@ -5,8 +5,20 @@ class EventState < ActiveRecord::Base
   	return _get_or_create_state("inventory added")
   end
 
+	def self.orderReceived
+  	return _get_or_create_state("order received")
+	end
+
   def self.matchedInventory
   	return _get_or_create_state("order matched with inventory")
+	end
+
+	def self.orderVerified # marks it ready for delivery
+  	return _get_or_create_state("order assignment verified")
+	end
+
+	def self.outForDelivery
+		return _get_or_create_state("out for delivery")
 	end
 
   private

@@ -9,8 +9,6 @@ Rails.application.routes.draw do
 
   resources :delivery_types
 
-  post 'events/createMatched' => 'events#createMatched'
-  delete 'events/removeMatched' => 'events#removeMatched'
   resources :events
 
   resources :event_states
@@ -18,6 +16,9 @@ Rails.application.routes.draw do
   resources :languages
 
   get 'orders/unmatched' => 'orders#unmatched'
+  post 'orders/assignDevice' => 'orders#assignDevice'
+  delete 'orders/unassignDevice' => 'orders#unassignDevice'
+  post 'orders/markVerified' => 'orders#markVerified'
   resources :orders
 
   get 'phones/inventorySnapshot/:order_id'  => 'phones#inventorySnapshot'

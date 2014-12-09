@@ -80,7 +80,12 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.timestamps
       t.belongs_to :order
       t.belongs_to :delivery_type
-      t.belongs_to :customer
+    end
+
+    # order detail
+    create_join_table :phones, :orders do |t|
+      t.index :phone_id
+      t.index :order_id
     end
 
     # shipment detail

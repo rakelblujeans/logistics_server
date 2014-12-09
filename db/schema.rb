@@ -99,6 +99,14 @@ ActiveRecord::Schema.define(version: 20141103213809) do
   add_index "orders", ["receipts_id"], name: "index_orders_on_receipts_id"
   add_index "orders", ["shipments_id"], name: "index_orders_on_shipments_id"
 
+  create_table "orders_phones", id: false, force: true do |t|
+    t.integer "phone_id", null: false
+    t.integer "order_id", null: false
+  end
+
+  add_index "orders_phones", ["order_id"], name: "index_orders_phones_on_order_id"
+  add_index "orders_phones", ["phone_id"], name: "index_orders_phones_on_phone_id"
+
   create_table "phones", force: true do |t|
     t.integer  "inventory_id"
     t.text     "MEID"
@@ -165,7 +173,6 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.datetime "updated_at"
     t.integer  "order_id"
     t.integer  "delivery_type_id"
-    t.integer  "customer_id"
   end
 
 end

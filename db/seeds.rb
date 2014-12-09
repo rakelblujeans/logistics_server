@@ -90,7 +90,7 @@ order1 = Order.create({
 	arrival_date: '2014-12-08',
 	departure_date: '2014-12-12',
 	language: 'en',
-	num_phones: 1,
+	num_phones: 3,
 	customer: c1,
 	active: true
 	});
@@ -109,7 +109,7 @@ order2 = Order.create({
 	arrival_date: '2014-12-10',
 	departure_date: '2014-12-14',
 	language: 'en',
-	num_phones: 1,
+	num_phones: 2,
 	customer: c1,
 	active: true
 	});
@@ -128,22 +128,27 @@ order3 = Order.create({
 	arrival_date: '2014-12-15',
 	departure_date: '2014-12-19',
 	language: 'en',
-	num_phones: 1,
+	num_phones: 4,
 	customer: c1,
 	active: true
 	});
+
+# order assignment
+order1.phone_ids = [phones[0].id, phones[1].id, phones[2].id]
+order2.phone_ids = [phones[3].id, phones[4].id]
+order3.phone_ids = [phones[5].id, phones[6].id, phones[7].id, phones[8].id]
 
 dt1 = DeliveryType.create({name: 'Fedex'});
 dt2 = DeliveryType.create({name: 'UPS'});
 dt3 = DeliveryType.create({name: 'By hand'});
 
+# delivery assignment
 shipment = Shipment.create({
 	fedex_out_code: '123XYZ',
 	fedex_return_code: '456QWE',
 	qty: 2,
 	order: order1,
 	delivery_type: dt1,
-	customer: c1,
 	active: true,
 	out_on_date: '2014-12-07'
 	});
@@ -152,6 +157,7 @@ event_states = EventState.create([
 	{ description: 'inventory added' },
 	{ description: 'order received' },
 	{ description: 'order matched with inventory' },
+	{ description: 'order assignment verified' },
 	{ description: 'out for delivery' },
 	{ description: 'received by customer' },
 	{ description: 'sent out by customer' },

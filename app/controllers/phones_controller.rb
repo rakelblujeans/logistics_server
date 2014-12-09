@@ -32,9 +32,8 @@ class PhonesController < ApplicationController
         @estate = EventState.inventoryAdded
         # TODO: catch errors
          @event = Event.create(
-          :active => true,
-          :event_state => @estate
-          )
+          event_state: @estate,
+          phone_id: @phone.id)
         format.html { redirect_to @phone, notice: 'Phone was successfully created.' }
         format.json { render :show, status: :created, location: @phone }
       else
@@ -74,6 +73,7 @@ class PhonesController < ApplicationController
     render "index"
   end
 
+=begin
   def assignedInventory
     @phones = Phone.assignedInventory(params[:order_id])
     render "index"
@@ -81,9 +81,9 @@ class PhonesController < ApplicationController
 
   def inventorySnapshot
     #logger.debug("PARAMS #{params.inspect}")
-    @assignedInventory, @availableInventory = Phone.inventorySnapshot(params[:order_id])    
+    @availableInventory = Phone.inventorySnapshot(params[:order_id])    
   end
-
+=end
 
   private
     # Use callbacks to share common setup or constraints between actions.
