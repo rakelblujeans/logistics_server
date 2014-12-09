@@ -144,8 +144,8 @@ dt3 = DeliveryType.create({name: 'By hand'});
 
 # delivery assignment
 shipment = Shipment.create({
-	fedex_out_code: '123XYZ',
-	fedex_return_code: '456QWE',
+	delivery_out_code: '123XYZ',
+	delivery_return_code: '456QWE',
 	qty: 2,
 	order: order1,
 	delivery_type: dt1,

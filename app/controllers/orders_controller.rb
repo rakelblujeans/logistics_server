@@ -109,7 +109,7 @@ class OrdersController < ApplicationController
     end
   end
 
-  # DELETE orders/removeMatched
+  # DELETE orders/removeMatched.json
   def unassignDevice
     # TODO: wrap in transaction...
     
@@ -141,6 +141,7 @@ class OrdersController < ApplicationController
     end
   end
 
+  # POST /orders/markVerified.json
   def markVerified
     # TODO: error checking
     @order = Order.where(id: params[:order_id]).first!

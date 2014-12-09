@@ -24,7 +24,24 @@ class ShipmentsController < ApplicationController
   # POST /shipments
   # POST /shipments.json
   def create
+    # TODO transaction wrap Shipment.transaction do
+    #Parameters: {"shipment"=>{" "phone_ids"=>[6, 7, 8, 9]
+    #TODO: dynamically determine delivery type by analyzing code
+    @delivery_type = DeliveryType.fedex
+    params[:shipment][:delivery_type_id] = @delivery_type.id
+    
+
+    # TODO: validate ids
+    @phone_ids = shipment_params[:phone_ids]
+    @phones = Phone.where(id: @phone_ids).all
+    params[:shipment][:qty] = @phones.length
     @shipment = Shipment.new(shipment_params)
+    @shipment.phone_ids = @phones.map(&:id)
+
+    @estate = EventState.inventoryDelivered
+    @event = Event.create(
+      event_state: @estate,
+      order_id: shipment_params[:order_id])
 
     respond_to do |format|
       if @shipment.save
@@ -69,7 +86,9 @@ class ShipmentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shipment_params
-      params[:shipment]
-      params.require(:shipment).permit(:active, :fedex_out_code, :fedex_return_code, :qty)
+      #params[:shipment][:phone_ids] ||= []
+      params.require(:shipment).permit(:active, :delivery_out_code, 
+        :delivery_return_code, :hand_delivered_by, :delivery_type_id, 
+        :qty, :out_on_date, :order_id, phone_ids: [])
     end
 end

@@ -1,4 +1,3 @@
 json.array!(@shipments) do |shipment|
-  json.extract! shipment, :id, :fedex_out_code, :fedex_return_code, :qty, :active, :out_on_date,
-  json.url shipment_url(shipment, format: :json)
+  json.extract! shipment, :id, :delivery_out_code, :delivery_return_code, :hand_delivered_by, :qty, :out_on_date, :delivery_type, :order, :phones, :active
 end

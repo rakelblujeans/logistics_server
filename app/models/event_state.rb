@@ -17,8 +17,8 @@ class EventState < ActiveRecord::Base
   	return _get_or_create_state("order assignment verified")
 	end
 
-	def self.outForDelivery
-		return _get_or_create_state("out for delivery")
+	def self.inventoryDelivered
+		return _get_or_create_state("inventory delivered")
 	end
 
   private

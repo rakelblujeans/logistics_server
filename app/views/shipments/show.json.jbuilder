@@ -1,2 +1,2 @@
-json.extract! @shipment, :id, :fedex_out_code, 
-	:fedex_return_code, :qty, :active, :out_on_date, :created_at, :updated_at
+json.extract! @shipment, :id, :delivery_out_code, 
+	:delivery_return_code, :hand_delivered_by, :qty, :active, :out_on_date, :delivery_type, :order, :phones, :created_at, :updated_at

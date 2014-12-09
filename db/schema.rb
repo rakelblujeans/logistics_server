@@ -164,8 +164,9 @@ ActiveRecord::Schema.define(version: 20141103213809) do
   end
 
   create_table "shipments", force: true do |t|
-    t.text     "fedex_out_code"
-    t.text     "fedex_return_code"
+    t.text     "delivery_out_code"
+    t.text     "hand_delivered_by"
+    t.text     "delivery_return_code"
     t.integer  "qty"
     t.boolean  "active"
     t.date     "out_on_date"

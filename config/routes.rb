@@ -15,10 +15,10 @@ Rails.application.routes.draw do
 
   resources :languages
 
-  get 'orders/unverified' => 'orders#unverified'
-  post 'orders/assignDevice' => 'orders#assignDevice'
+  get 'orders/unverified'        => 'orders#unverified'
+  post 'orders/assignDevice'     => 'orders#assignDevice'
   delete 'orders/unassignDevice' => 'orders#unassignDevice'
-  post 'orders/markVerified' => 'orders#markVerified'
+  post 'orders/markVerified'     => 'orders#markVerified'
   resources :orders
 
   get 'phones/inventorySnapshot/:order_id'  => 'phones#inventorySnapshot'

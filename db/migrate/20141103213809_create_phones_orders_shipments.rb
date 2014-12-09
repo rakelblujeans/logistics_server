@@ -72,8 +72,9 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
     end
 
     create_table :shipments do |t|
-      t.text :fedex_out_code
-      t.text :fedex_return_code
+      t.text :delivery_out_code
+      t.text :hand_delivered_by
+      t.text :delivery_return_code
       t.integer :qty
       t.boolean :active
       t.date :out_on_date
