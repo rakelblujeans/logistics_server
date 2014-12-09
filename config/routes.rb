@@ -15,7 +15,7 @@ Rails.application.routes.draw do
 
   resources :languages
 
-  get 'orders/unmatched' => 'orders#unmatched'
+  get 'orders/unverified' => 'orders#unverified'
   post 'orders/assignDevice' => 'orders#assignDevice'
   delete 'orders/unassignDevice' => 'orders#unassignDevice'
   post 'orders/markVerified' => 'orders#markVerified'

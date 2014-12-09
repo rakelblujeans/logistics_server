@@ -11,7 +11,6 @@ class Order < ActiveRecord::Base
     @state_received = EventState.orderReceived
     @state_matched = EventState.matchedInventory
     @ids = []
-    #logger.warn "HELOOOOO: #{@state.valid?}"
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
       if event.event_state_id == @state_received.id || 
@@ -40,6 +39,7 @@ class Order < ActiveRecord::Base
     @orders = Order.find(@ids)
   end
 =end
+
   # TODO: fix. not optimal!
   def bruteForceAssignPhones
     #TODO: error checking, wrap in transaction

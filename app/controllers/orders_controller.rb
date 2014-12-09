@@ -13,7 +13,7 @@ class OrdersController < ApplicationController
   end
 
   # GET /orders/unmatched
-  def unmatched
+  def unverified
     @orders = Order.unverified
   end
 
@@ -150,10 +150,6 @@ class OrdersController < ApplicationController
     @event = Event.create(
       order_id: params[:order_id],
       event_state_id: @state.id)
-    if @event != nil
-      @event.destroy
-    end
-
   rescue ActiveRecord::RecordNotFound
   ensure
     respond_to do |format|
