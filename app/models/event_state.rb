@@ -26,6 +26,6 @@ class EventState < ActiveRecord::Base
 	  		@state = EventState.where(description: description).first!
 	  	return @state
 	  rescue ActiveRecord::RecordNotFound
-	  	@state = EventState.new(description: description)
+	  	@state = EventState.create(description: description)
 	  end
 end

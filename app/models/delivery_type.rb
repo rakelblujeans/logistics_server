@@ -14,11 +14,11 @@ class DeliveryType < ActiveRecord::Base
   end
 
   def self.hand_delivery
-  	return _get_or_create_type("Hand delivery")
+  	return _get_or_create_type("hand delivery")
   end
 
   def self.other
-  	return _get_or_create_type("Unknown method")
+  	return _get_or_create_type("unknown delivery method")
   end
 
   def self.detect(input)
@@ -58,6 +58,6 @@ class DeliveryType < ActiveRecord::Base
 	  		@dtype = DeliveryType.where(name: name).first!
 	  	return @dtype
 	  rescue ActiveRecord::RecordNotFound
-	  	@dtype = DeliveryType.new(name: name)
+	  	@dtype = DeliveryType.create(name: name)
 	  end
 end

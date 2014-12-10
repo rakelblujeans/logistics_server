@@ -140,7 +140,8 @@ order3.phone_ids = [phones[5].id, phones[6].id, phones[7].id, phones[8].id]
 
 dt1 = DeliveryType.create({name: 'Fedex'});
 dt2 = DeliveryType.create({name: 'UPS'});
-dt3 = DeliveryType.create({name: 'By hand'});
+dt3 = DeliveryType.create({name: 'hand delivery'});
+dt4 = DeliveryType.create({name: 'unknown delivery method'});
 
 # delivery assignment
 shipment = Shipment.create({

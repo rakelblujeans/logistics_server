@@ -25,11 +25,17 @@ class ShipmentsController < ApplicationController
   # POST /shipments.json
   def create
     # TODO transaction wrap Shipment.transaction do
-    #Parameters: {"shipment"=>{" "phone_ids"=>[6, 7, 8, 9]
     #TODO: dynamically determine delivery type by analyzing code
-    @delivery_type = DeliveryType.fedex
+    #@delivery_type = DeliveryType.fedex
+    #params[:shipment][:delivery_type_id] = @delivery_type.id
+
+    if params[:shipment][:hand_delivered_by]
+      @delivery_type = DeliveryType.hand_delivery
+    else
+      # ex:'1Z9999999999999999'
+      @delivery_type = DeliveryType.detect(params[:shipment][:delivery_out_code])
+    end
     params[:shipment][:delivery_type_id] = @delivery_type.id
-    
 
     # TODO: validate ids
     @phone_ids = shipment_params[:phone_ids]
