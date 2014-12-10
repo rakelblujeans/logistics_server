@@ -67,6 +67,7 @@ class PhonesController < ApplicationController
     end
   end
   
+  # GET /phone/available_inventory.json
   def available_inventory
     #logger.debug("PARAMS #{params.inspect}")
     @phones = Phone.available_inventory(params[:start_date], params[:end_date])
@@ -76,6 +77,11 @@ class PhonesController < ApplicationController
   # GET /phones/1/upcoming_orders.json
   def upcoming_orders
     @orders = @phone.upcoming_orders
+  end
+
+  # GET /phones/incoming_on.json
+  def incoming_on
+    @phones = Phone.incoming_on(params[:date])
   end
 
   private

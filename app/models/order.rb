@@ -22,24 +22,6 @@ class Order < ActiveRecord::Base
     @orders = Order.find(@ids)
   end
 
-=begin
-	# gets list of all unmatched orders
-  def self.unmatched
-    # TODO: once you hit 1000 orders you will notice performance degradation here
-  	@state = EventState.orderReceived
-    @ids = []
-    #logger.warn "HELOOOOO: #{@state.valid?}"
-    @events = Event.group(:order_id).having("max(events.created_at)")
-    @events.each do |event|
-      if event.event_state_id == @state.id
-        @ids << event.order_id
-      end
-    end
-
-    @orders = Order.find(@ids)
-  end
-=end
-
   # TODO: fix. not optimal!
   def brute_force_assign_phones
     #TODO: error checking, wrap in transaction

@@ -82,8 +82,8 @@ class OrdersController < ApplicationController
     end
   end
 
-  # POST orders/assignDevice
-  def assignDevice
+  # POST orders/assign_device
+  def assign_device
     # TODO: wrap in transaction...
     @order = Order.where(id: params[:order_id]).first!
     @phone = Phone.where(id: params[:phone_id]).first!
@@ -109,8 +109,8 @@ class OrdersController < ApplicationController
     end
   end
 
-  # DELETE orders/removeMatched.json
-  def unassignDevice
+  # DELETE orders/unassign_device.json
+  def unassign_device
     # TODO: wrap in transaction...
     
     # update order's phone list
@@ -141,8 +141,8 @@ class OrdersController < ApplicationController
     end
   end
 
-  # POST /orders/markVerified.json
-  def markVerified
+  # POST /orders/mark_verified.json
+  def mark_verified
     # TODO: error checking
     @order = Order.where(id: params[:order_id]).first!
 

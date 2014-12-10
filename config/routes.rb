@@ -16,15 +16,16 @@ Rails.application.routes.draw do
   resources :languages
 
   get 'orders/unverified'        => 'orders#unverified'
-  post 'orders/assignDevice'     => 'orders#assignDevice'
-  delete 'orders/unassignDevice' => 'orders#unassignDevice'
-  post 'orders/markVerified'     => 'orders#markVerified'
+  post 'orders/assign_device'     => 'orders#assign_device'
+  delete 'orders/unassign_device' => 'orders#unassign_device'
+  post 'orders/mark_verified'     => 'orders#mark_verified'
   resources :orders
 
   #get 'phones/inventory_snapshot/:order_id'  => 'phones#inventory_snapshot'
   #get 'phones/assigned_inventory/:order_id'  => 'phones#assigned_inventory'
   get 'phones/available_inventory' => 'phones#available_inventory'
   get 'phones/:id/upcoming_orders' => 'phones#upcoming_orders'
+  get 'phones/incoming_on'         => 'phones#incoming_on'
   resources :phones
 
   resources :providers

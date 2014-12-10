@@ -21,6 +21,18 @@ class EventState < ActiveRecord::Base
 		return _get_or_create_state("inventory delivered")
 	end
 
+	def self.customerReceived
+		return _get_or_create_state("received by customer")
+	end
+
+	def self.customerSentBack
+		return _get_or_create_state("sent out by customer")
+	end
+
+	def self.receivedInventory
+		return _get_or_create_state("inventory received by office")
+	end
+
   private
 	  def self._get_or_create_state(description)
 	  		@state = EventState.where(description: description).first!
