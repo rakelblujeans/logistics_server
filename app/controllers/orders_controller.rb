@@ -44,7 +44,7 @@ class OrdersController < ApplicationController
 
         # assign phones
         # TODO: dumb assignment for now, needs optimization
-        @order.bruteForceAssignPhones
+        @order.brute_force_assign_phones
 
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
         format.json { render :show, status: :created, location: @order }
@@ -61,7 +61,7 @@ class OrdersController < ApplicationController
     respond_to do |format|
       if @order.update(order_params)
         
-        @order.bruteForceAssignPhones
+        @order.brute_force_assign_phones
 
         format.html { redirect_to @order, notice: 'Order was successfully updated.' }
         format.json { render :show, status: :ok, location: @order }

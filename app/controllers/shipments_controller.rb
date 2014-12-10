@@ -92,7 +92,6 @@ class ShipmentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def shipment_params
-      #params[:shipment][:phone_ids] ||= []
       params.require(:shipment).permit(:active, :delivery_out_code, 
         :delivery_return_code, :hand_delivered_by, :delivery_type_id, 
         :qty, :out_on_date, :order_id, phone_ids: [])

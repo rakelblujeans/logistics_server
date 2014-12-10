@@ -21,9 +21,10 @@ Rails.application.routes.draw do
   post 'orders/markVerified'     => 'orders#markVerified'
   resources :orders
 
-  get 'phones/inventorySnapshot/:order_id'  => 'phones#inventorySnapshot'
-  get 'phones/assignedInventory/:order_id'  => 'phones#assignedInventory'
-  get 'phones/availableInventory'     => 'phones#availableInventory'
+  #get 'phones/inventory_snapshot/:order_id'  => 'phones#inventory_snapshot'
+  #get 'phones/assigned_inventory/:order_id'  => 'phones#assigned_inventory'
+  get 'phones/available_inventory' => 'phones#available_inventory'
+  get 'phones/:id/upcoming_orders' => 'phones#upcoming_orders'
   resources :phones
 
   resources :providers

@@ -41,12 +41,12 @@ class Order < ActiveRecord::Base
 =end
 
   # TODO: fix. not optimal!
-  def bruteForceAssignPhones
+  def brute_force_assign_phones
     #TODO: error checking, wrap in transaction
 
     # get list of available phones, assign all open slots
     #logger.debug("***** " + self.inspect)
-    @phones = Phone.availableInventory(self.arrival_date, self.departure_date)
+    @phones = Phone.available_inventory(self.arrival_date, self.departure_date)
     if @phones.empty?
       logger.debug "No phones available!"
       return []

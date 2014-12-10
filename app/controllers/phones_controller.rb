@@ -1,5 +1,5 @@
 class PhonesController < ApplicationController
-  before_action :set_phone, only: [:show, :edit, :update, :destroy]
+  before_action :set_phone, only: [:show, :edit, :update, :destroy, :upcoming_orders]
 
   # GET /phones
   # GET /phones.json
@@ -66,24 +66,17 @@ class PhonesController < ApplicationController
       format.json { head :no_content }
     end
   end
-
-  def availableInventory
+  
+  def available_inventory
     #logger.debug("PARAMS #{params.inspect}")
-    @phones = Phone.availableInventory(params[:start_date], params[:end_date])
+    @phones = Phone.available_inventory(params[:start_date], params[:end_date])
     render "index"
   end
 
-=begin
-  def assignedInventory
-    @phones = Phone.assignedInventory(params[:order_id])
-    render "index"
+  # GET /phones/1/upcoming_orders.json
+  def upcoming_orders
+    @orders = @phone.upcoming_orders
   end
-
-  def inventorySnapshot
-    #logger.debug("PARAMS #{params.inspect}")
-    @availableInventory = Phone.inventorySnapshot(params[:order_id])    
-  end
-=end
 
   private
     # Use callbacks to share common setup or constraints between actions.
