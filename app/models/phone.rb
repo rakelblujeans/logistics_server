@@ -30,13 +30,12 @@ class Phone < ActiveRecord::Base
     end
   end
 
-  def self.addNew(attributes = nil) #phone_params)
+  def self.addNew(attributes = nil)
     if attributes.is_a?(Array)
       attributes.collect { |attr| self.addNewHelper(attr) }
     else
       object = self.addNewHelper(attributes)
       yield(object) if block_given?
-      #object.save
       object
     end
   end

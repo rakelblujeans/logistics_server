@@ -76,7 +76,7 @@ c1 = Customer.create({
 	email: 'test@gmail.com', 
 	active: true});
 
-order1 = Order.create({
+order1 = Order.addNew({
 	invoice_id: 'XYZ123',
 	delivery_type_str: 'residential',
 	full_address: '123 Main St',
@@ -95,7 +95,7 @@ order1 = Order.create({
 	active: true
 	});
 
-order2 = Order.create({
+order2 = Order.addNew({
 	invoice_id: '456',
 	delivery_type_str: 'residential',
 	full_address: '123 Main St',
@@ -114,7 +114,7 @@ order2 = Order.create({
 	active: true
 	});
 
-order3 = Order.create({
+order3 = Order.addNew({
 	invoice_id: '789',
 	delivery_type_str: 'residential',
 	full_address: '456 Main St',
@@ -132,11 +132,6 @@ order3 = Order.create({
 	customer: c1,
 	active: true
 	});
-
-# order assignment
-order1.phone_ids = [phones[0].id, phones[1].id, phones[2].id]
-order2.phone_ids = [phones[3].id, phones[4].id]
-order3.phone_ids = [phones[5].id, phones[6].id, phones[7].id, phones[8].id]
 
 dt1 = DeliveryType.create({name: 'Fedex'});
 dt2 = DeliveryType.create({name: 'UPS'});
