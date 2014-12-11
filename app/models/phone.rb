@@ -11,6 +11,36 @@ class Phone < ActiveRecord::Base
     obj.kind_of?(String)
   end
 
+  # adds one new phones
+  def self.addNewHelper(phone_params)
+    begin
+      @phone = nil
+      Phone.transaction do
+        @phone = Phone.new(phone_params)
+        @phone.save
+
+        @estate = EventState.inventoryAdded
+        @event = Event.create(
+          event_state: @estate,
+          phone_id: @phone.id)
+      end
+      @phone
+    rescue ActiveRecord::StatementInvalid
+      return nil
+    end
+  end
+
+  def self.addNew(attributes = nil) #phone_params)
+    if attributes.is_a?(Array)
+      attributes.collect { |attr| self.addNewHelper(attr) }
+    else
+      object = self.addNewHelper(attributes)
+      yield(object) if block_given?
+      #object.save
+      object
+    end
+  end
+
   # list of inventory available for assignment during 
   # this data range
   # expects dates as UTC YYYY-MM-DD (no slashes)
@@ -106,6 +136,65 @@ class Phone < ActiveRecord::Base
     end
 =end
     @phones = Phone.where(id: @phone_ids)
+  end
+
+  # what phones leave our office on this date?
+  def self.outbound_on(in_date)
+    in_date.sub! "/", "-"
+    if self.string? in_date
+      in_date = Date.strptime(in_date, "%Y-%m-%d")
+    end
+
+    # [date customer needs phone] - [time spent in transit] 
+    # = estimated departure date from our office
+    @leading_transit_time = 3
+    @real_date = in_date - @leading_transit_time
+
+    # convert back to string
+    @real_date = @real_date.strftime("%Y-%m-%d")
+
+    # only consider orders that we have manually verified
+    # as "shippable"
+    @event_state = EventState.orderVerified
+    @order_ids = []
+    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    @events.each do |event|
+      if event.event_state_id == @event_state.id
+        @order_ids << event.order_id
+      end
+    end
+
+    @phone_ids = Order.joins(:phones).where(id: @order_ids, arrival_date: @real_date).pluck(:phone_id)
+    @phones = Phone.where(id: @phone_ids)
+  end
+
+  def current_order
+    @today = Time.now.utc
+    
+    @orders = self.orders.where("DATE(?) <= arrival_date DATE(?) <= departure_date", 
+      @today-3, @today+3)
+    # TODO: throw warning if more than 1 returned...
+    logger.debug "*** NUM OF CURRENT ORDERS: #{@orders.length}"
+    if @orders
+      return @orders[0]
+    else
+      return nil
+    end
+  end
+
+  def check_in(id)
+    @phone = Phone.find(id)
+
+    # record event
+    @estate = EventState.receivedInventory
+    @event_params = [
+      event_state: @estate,
+      phone_id: @phone.id]
+    @event = Event.create(@event_params)
+    if (@phone.current_order)
+      @event_params[:order_id] = @phone.current_order.id
+    end
+
   end
 
 end

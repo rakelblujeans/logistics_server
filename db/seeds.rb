@@ -20,7 +20,7 @@ languages = Language.create([
 	{name: 'Spanish'}
 ])
 
-phones = Phone.create([
+phones = Phone.addNew([
 	{inventory_id: '01', MEID: '35823905652413', ICCID: '89011200000198262890', notes: "Raj's phone", last_imaged: '2014-10-01', provider:p1, active: true},
 	{inventory_id: '02', MEID: '352584060022552', notes: "Raquel's phone/Imaging", last_imaged: '2014-10-01', provider:p1, active: true},
 	{inventory_id: '08', MEID: '35823905766070', ICCID: '89011200000277619192', phone_num: '646-303-0170', notes: "Edward's phone", last_imaged: '2014-10-01', provider:p1, active: true},
@@ -87,8 +87,8 @@ order1 = Order.create({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-12-08',
-	departure_date: '2014-12-12',
+	arrival_date: '2014-12-05',
+	departure_date: '2014-12-08',
 	language: 'en',
 	num_phones: 3,
 	customer: c1,
@@ -106,8 +106,8 @@ order2 = Order.create({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-12-10',
-	departure_date: '2014-12-14',
+	arrival_date: '2014-12-14',
+	departure_date: '2014-12-18',
 	language: 'en',
 	num_phones: 2,
 	customer: c1,
@@ -125,8 +125,8 @@ order3 = Order.create({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-12-15',
-	departure_date: '2014-12-19',
+	arrival_date: '2014-12-05',
+	departure_date: '2014-12-08',
 	language: 'en',
 	num_phones: 4,
 	customer: c1,

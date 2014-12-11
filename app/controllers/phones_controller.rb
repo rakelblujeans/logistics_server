@@ -24,16 +24,8 @@ class PhonesController < ApplicationController
   # POST /phones
   # POST /phones.json
   def create
-    @phone = Phone.new(phone_params)
-
     respond_to do |format|
-      if @phone.save
-        # record event
-        @estate = EventState.inventoryAdded
-        # TODO: catch errors
-         @event = Event.create(
-          event_state: @estate,
-          phone_id: @phone.id)
+      if Phone.addNew(phone_params)
         format.html { redirect_to @phone, notice: 'Phone was successfully created.' }
         format.json { render :show, status: :created, location: @phone }
       else
@@ -82,6 +74,16 @@ class PhonesController < ApplicationController
   # GET /phones/incoming_on.json
   def incoming_on
     @phones = Phone.incoming_on(params[:date])
+  end
+
+  # GET /phones/outbound_on.json
+  def outbound_on
+    @phones = Phone.outbound_on(params[:date])
+  end
+
+  # POST
+  def check_in
+    @was_successful = Phone.check_in(params[:id])
   end
 
   private
