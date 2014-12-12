@@ -24,33 +24,9 @@ class ShipmentsController < ApplicationController
   # POST /shipments
   # POST /shipments.json
   def create
-    # TODO transaction wrap Shipment.transaction do
-    #TODO: dynamically determine delivery type by analyzing code
-    #@delivery_type = DeliveryType.fedex
-    #params[:shipment][:delivery_type_id] = @delivery_type.id
-
-    if params[:shipment][:hand_delivered_by]
-      @delivery_type = DeliveryType.hand_delivery
-    else
-      # ex:'1Z9999999999999999'
-      @delivery_type = DeliveryType.detect(params[:shipment][:delivery_out_code])
-    end
-    params[:shipment][:delivery_type_id] = @delivery_type.id
-
-    # TODO: validate ids
-    @phone_ids = shipment_params[:phone_ids]
-    @phones = Phone.where(id: @phone_ids).all
-    params[:shipment][:qty] = @phones.length
-    @shipment = Shipment.new(shipment_params)
-    @shipment.phone_ids = @phones.map(&:id)
-
-    @estate = EventState.inventoryDelivered
-    @event = Event.create(
-      event_state: @estate,
-      order_id: shipment_params[:order_id])
-
+    @shipment = Shipment.addNew(shipment_params)
     respond_to do |format|
-      if @shipment.save
+      if @shipment
         format.html { redirect_to @shipment, notice: 'Shipment was successfully created.' }
         format.json { render :show, status: :created, location: @shipment }
       else

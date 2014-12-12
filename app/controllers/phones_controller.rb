@@ -24,8 +24,9 @@ class PhonesController < ApplicationController
   # POST /phones
   # POST /phones.json
   def create
+    @phone = Phone.addNew(phone_params)
     respond_to do |format|
-      if Phone.addNew(phone_params)
+      if @phone
         format.html { redirect_to @phone, notice: 'Phone was successfully created.' }
         format.json { render :show, status: :created, location: @phone }
       else

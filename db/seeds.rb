@@ -1,12 +1,6 @@
 # ruby encoding: utf-8
 
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
+# Set up the simple data first. Everything else is based off these...
 
 p1 = Provider.create({name: 'Sprint/Kajeet', active: true});
 p2 = Provider.create({name: 'AT&T', active: true});
@@ -19,6 +13,28 @@ languages = Language.create([
 	{name: 'Mandarin'},
 	{name: 'Spanish'}
 ])
+
+event_states = EventState.create([
+	{ description: 'inventory added' },
+	{ description: 'order received' },
+	{ description: 'order matched with inventory' },
+	{ description: 'order assignment verified' },
+	{ description: 'out for delivery' },
+	{ description: 'received by customer' },
+	{ description: 'sent out by customer' },
+	{ description: 'received' },
+	{ description: 'lost or stolen' },
+	{ description: 'removed from inventory' },
+	{ description: 'temporarily disabled' },
+	]);
+
+dt1 = DeliveryType.create({name: 'Fedex'});
+dt2 = DeliveryType.create({name: 'UPS'});
+dt3 = DeliveryType.create({name: 'hand delivery'});
+dt4 = DeliveryType.create({name: 'unknown delivery method'});
+
+
+# Now for the more complex data. Depends on one or more of the above...
 
 phones = Phone.addNew([
 	{inventory_id: '01', MEID: '35823905652413', ICCID: '89011200000198262890', notes: "Raj's phone", last_imaged: '2014-10-01', provider:p1, active: true},
@@ -87,8 +103,8 @@ order1 = Order.addNew({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-12-05',
-	departure_date: '2014-12-08',
+	arrival_date: '2014-12-06',
+	departure_date: '2014-12-09',
 	language: 'en',
 	num_phones: 3,
 	customer: c1,
@@ -106,8 +122,8 @@ order2 = Order.addNew({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-12-14',
-	departure_date: '2014-12-18',
+	arrival_date: '2014-12-15',
+	departure_date: '2014-12-19',
 	language: 'en',
 	num_phones: 2,
 	customer: c1,
@@ -131,60 +147,6 @@ order3 = Order.addNew({
 	num_phones: 4,
 	customer: c1,
 	active: true
-	});
-
-dt1 = DeliveryType.create({name: 'Fedex'});
-dt2 = DeliveryType.create({name: 'UPS'});
-dt3 = DeliveryType.create({name: 'hand delivery'});
-dt4 = DeliveryType.create({name: 'unknown delivery method'});
-
-# delivery assignment
-shipment = Shipment.create({
-	delivery_out_code: '123XYZ',
-	delivery_return_code: '456QWE',
-	qty: 2,
-	order: order1,
-	delivery_type: dt1,
-	active: true,
-	out_on_date: '2014-12-07'
-	});
-
-event_states = EventState.create([
-	{ description: 'inventory added' },
-	{ description: 'order received' },
-	{ description: 'order matched with inventory' },
-	{ description: 'order assignment verified' },
-	{ description: 'out for delivery' },
-	{ description: 'received by customer' },
-	{ description: 'sent out by customer' },
-	{ description: 'received' },
-	{ description: 'lost or stolen' },
-	{ description: 'removed from inventory' },
-	{ description: 'temporarily disabled' },
-	]);
-
-event1 = Event.create({
-	customer: c1,
-	order: order1,
-	event_state: event_states[1],
-	});
-
-event2 = Event.create({
-	customer: c1,
-	order: order1,
-	event_state: event_states[2],
-	});
-
-event3 = Event.create({
-	customer: c1,
-	order: order2,
-	event_state: event_states[1],
-	});
-
-event4 = Event.create({
-	customer: c1,
-	order: order3,
-	event_state: event_states[1],
 	});
 
 card1 = CreditCard.create({last4:'1234', bt_id: 'X123Z02', customer: c1, active: true});

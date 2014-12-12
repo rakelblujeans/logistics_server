@@ -17,6 +17,14 @@ class OrdersController < ApplicationController
     @orders = Order.unverified
   end
 
+  def verified
+    @orders = Order.verified
+    respond_to do |format|
+      #format.html { render @order, notice: 'Order was successfully created.' }
+      format.json { render :index, status: :ok, location: @order }
+    end
+  end
+
   # GET /orders/new
   def new
     @order = Order.new
@@ -31,8 +39,9 @@ class OrdersController < ApplicationController
   def create
     params[:arrival_date].sub! "/", "-"
     params[:departure_date].sub! "/", "-"
+    @order = Order.addNew(order_params)
     respond_to do |format|
-      if Order.addNew(order_params)
+      if @order
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
         format.json { render :show, status: :created, location: @order }
       else

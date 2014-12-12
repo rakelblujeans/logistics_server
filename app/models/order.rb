@@ -57,6 +57,20 @@ class Order < ActiveRecord::Base
     @orders = Order.find(@ids)
   end
 
+  # gets list of all unverified orders
+  def self.verified
+    @state_verified = EventState.orderVerified
+    @ids = []
+    @events = Event.group(:order_id).having("max(events.created_at)")
+    @events.each do |event|
+      if event.event_state_id == @state_verified.id
+        @ids << event.order_id
+      end
+    end
+
+    @orders = Order.find(@ids)
+  end
+
   def assign_device(phone_id)
     Order.transaction do
       @phone = Phone.where(id: phone_id).first!
