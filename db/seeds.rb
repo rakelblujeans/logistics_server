@@ -92,6 +92,7 @@ c1 = Customer.create({
 	email: 'test@gmail.com', 
 	active: true});
 
+
 order1 = Order.addNew({
 	invoice_id: 'XYZ123',
 	delivery_type_str: 'residential',
@@ -122,8 +123,8 @@ order2 = Order.addNew({
 	shipping_country: 'USA',
 	shipping_apt_suite: '4C',
 	shipping_notes: 'leave a note on the door',
-	arrival_date: '2014-12-15',
-	departure_date: '2014-12-19',
+	arrival_date: '2014-12-09',
+	departure_date: '2014-12-17',
 	language: 'en',
 	num_phones: 2,
 	customer: c1,

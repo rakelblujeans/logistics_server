@@ -6,14 +6,28 @@ class Order < ActiveRecord::Base
   has_many :receipts
   has_many :events
 
+  def self.date?(obj)
+    obj.kind_of?(Date)
+  end
+
+  def self.string?(obj)
+    obj.kind_of?(String)
+  end
+
 
   def self.addNewHelper(order_params)
+    
     begin
       @order = nil
       Order.transaction do
-        order_params[:active] = true
-        order_params[:arrival_date].sub! "/", "-"
-        order_params[:departure_date].sub! "/", "-"
+        order_params["active"] = true
+
+        if self.string? order_params["arrival_date"]
+          order_params["arrival_date"].gsub! "/", "-"
+        end
+        if self.string? order_params["departure_date"]
+          order_params["departure_date"].gsub! "/", "-"
+        end
         @order = Order.new(order_params)
         @order.save
 
@@ -23,7 +37,7 @@ class Order < ActiveRecord::Base
           order_id: @order.id)
         # assign phones
         # TODO: dumb assignment for now, needs optimization
-        @order.brute_force_assign_phones
+        #@order.brute_force_assign_phones
       end
       @order
     rescue ActiveRecord::StatementInvalid
@@ -35,6 +49,7 @@ class Order < ActiveRecord::Base
     if attributes.is_a?(Array)
       attributes.collect { |attr| self.addNewHelper(attr) }
     else
+      #puts "**** #{@attributes.inspect}"
       object = self.addNewHelper(attributes)
       yield(object) if block_given?
       object

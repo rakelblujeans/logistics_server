@@ -70,16 +70,37 @@ class PhonesController < ApplicationController
   # GET /phones/1/upcoming_orders.json
   def upcoming_orders
     @orders = @phone.upcoming_orders
+    #respond_to do |format|
+    #format.html { redirect_to @phone }
+    #format.json { render :show, status: :ok, location: @phone }
+  end
+
+  # GET /phones/1/current_order.json
+  def current_order
+    @phone = Phone.find(params[:id])
+    @orders = @phone.current_order
+    respond_to do |format|
+      #format.html { redirect_to @phone }
+      format.json { render :upcoming_orders, status: :ok, location: @phone }
+    end
   end
 
   # GET /phones/incoming_on.json
   def incoming_on
     @phones = Phone.incoming_on(params[:date])
+    respond_to do |format|
+      #format.html { redirect_to @phone }
+      format.json { render :index, status: :ok, location: @phone }
+    end
   end
 
   # GET /phones/outbound_on.json
   def outbound_on
     @phones = Phone.outbound_on(params[:date])
+    respond_to do |format|
+      #format.html { redirect_to @phone }
+      format.json { render :index, status: :ok, location: @phone }
+    end
   end
 
   # POST

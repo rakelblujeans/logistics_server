@@ -7,13 +7,15 @@ one:
   phone_num: MyText
   notes: MyText
   last_imaged: 2014-11-03
-  provider_id: 
+  active: true
+  provider_id:
 
 two:
-  inventory_id: 1
+  inventory_id: 2
   MEID: MyText
   ICCID: MyText
   phone_num: MyText
   notes: MyText
   last_imaged: 2014-11-03
-  provider_id: 
+  active: true
+  provider_id:  

@@ -83,7 +83,7 @@ class Phone < ActiveRecord::Base
 
     today = Time.now.utc
     self.orders.each do |order|
-      if order.arrival_date < today
+      if order.arrival_date > today
         @upcoming_orders << order
       end
     end
@@ -94,8 +94,8 @@ class Phone < ActiveRecord::Base
   # what phones arrive in our office on this date?
   def self.incoming_on(in_date)
     # if string, convert to date object
-    in_date.sub! "/", "-"
     if self.string? in_date
+      in_date.gsub! "/", "-"
       in_date = Date.strptime(in_date, "%Y-%m-%d")
     end
 
@@ -120,45 +120,33 @@ class Phone < ActiveRecord::Base
     end
 
     @phone_ids = Order.joins(:phones).where(id: @order_ids, departure_date: @departure_date).pluck(:phone_id)
-    # TODO: if you want to track delivery events, replace the line above
-    # with some like this:
-=begin
-    @state_received = EventState.receivedInventory
-    @order_ids = []
-    @events = Event.joins(:order).group(:order_id).having(
-      "max(events.created_at) AND departure_date == " + @departure_date)
-    @events.each do |event|
-      if event.event_state_id == @state_received.id || 
-        event.event_state_id == @state_matched.id
-        @order_ids << event.order_id
-      end
-    end
-=end
     @phones = Phone.where(id: @phone_ids)
   end
 
   # what phones leave our office on this date?
   def self.outbound_on(in_date)
-    in_date.sub! "/", "-"
+    # if string, convert to date object
     if self.string? in_date
+      in_date.gsub! "/", "-"
       in_date = Date.strptime(in_date, "%Y-%m-%d")
     end
 
     # [date customer needs phone] - [time spent in transit] 
     # = estimated departure date from our office
     @leading_transit_time = 3
-    @real_date = in_date - @leading_transit_time
+    @real_date = in_date + @leading_transit_time
 
     # convert back to string
     @real_date = @real_date.strftime("%Y-%m-%d")
 
     # only consider orders that we have manually verified
     # as "shippable"
-    @event_state = EventState.orderVerified
+    @event_order_verified = EventState.orderVerified
     @order_ids = []
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+
     @events.each do |event|
-      if event.event_state_id == @event_state.id
+      if event.event_state_id == @event_order_verified.id
         @order_ids << event.order_id
       end
     end
@@ -168,12 +156,12 @@ class Phone < ActiveRecord::Base
   end
 
   def current_order
-    @today = Time.now.utc
+    @today = Date.today
+    @orders = self.orders.where(
+      "date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') > DATE(?)", 
+      @today, @today)
     
-    @orders = self.orders.where("DATE(?) <= arrival_date DATE(?) <= departure_date", 
-      @today-3, @today+3)
     # TODO: throw warning if more than 1 returned...
-    logger.debug "*** NUM OF CURRENT ORDERS: #{@orders.length}"
     if @orders
       return @orders[0]
     else
@@ -181,7 +169,7 @@ class Phone < ActiveRecord::Base
     end
   end
 
-  def check_in(id)
+  def self.check_in(id)
     @phone = Phone.find(id)
 
     # record event
@@ -190,10 +178,7 @@ class Phone < ActiveRecord::Base
       event_state: @estate,
       phone_id: @phone.id]
     @event = Event.create(@event_params)
-    if (@phone.current_order)
-      @event_params[:order_id] = @phone.current_order.id
-    end
-
+    @event[0]
   end
 
 end
