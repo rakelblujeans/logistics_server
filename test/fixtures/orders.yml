@@ -1,8 +1,9 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  order_state: 1
-  delivery_type: MyText
+# Test upcoming orders
+upcoming_order:
+  invoice_id: 456XYZ
+  delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
   shipping_city: MyText
@@ -11,18 +12,15 @@ one:
   shipping_country: MyText
   shipping_apt_suite: MyText
   shipping_notes: MyText
-  arrival_date: 2014-11-04
-  departure_date: 2014-11-04
+  arrival_date: <%= Date.today + 3 %>
+  departure_date: <%= Date.today + 6%>
   language: MyText
   num_phones: 1
-  fedex_out_code: MyText
-  fedex_return_code: MyText
-  customer_id: 
-  phone_id: 
+  active: true
 
-two:
-  order_state: 1
-  delivery_type: MyText
+current_order:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
   shipping_city: MyText
@@ -31,11 +29,127 @@ two:
   shipping_country: MyText
   shipping_apt_suite: MyText
   shipping_notes: MyText
-  arrival_date: 2014-11-04
-  departure_date: 2014-11-04
+  arrival_date: <%= Date.today - 7 %>
+  departure_date: <%= Date.today - 2 %>
   language: MyText
-  num_phones: 1
-  fedex_out_code: MyText
-  fedex_return_code: MyText
-  customer_id: 
-  phone_id: 
+  num_phones: 3
+  active: true
+
+not_current_order_1:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today + 4 %>
+  departure_date: <%= Date.today + 7 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
+not_current_order_2:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today - 7 %>
+  departure_date: <%= Date.today - 3 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
+incoming_today:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today - 10 %>
+  departure_date: <%= Date.today - 3 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
+not_incoming_today:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today + 4 %>
+  departure_date: <%= Date.today + 10 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
+outbound_today:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today + 3 %>
+  departure_date: <%= Date.today + 7 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
+not_outbound_today:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today + 2 %>
+  departure_date: <%= Date.today + 7 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
+generic:
+  invoice_id: XYZ123
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today + 2 %>
+  departure_date: <%= Date.today + 7 %>
+  language: MyText
+  num_phones: 3
+  active: true

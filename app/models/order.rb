@@ -33,11 +33,8 @@ class Order < ActiveRecord::Base
 
         @state = EventState.orderReceived
         @event = Event.create(
-          event_state: @estate,
+          event_state: @state,
           order_id: @order.id)
-        # assign phones
-        # TODO: dumb assignment for now, needs optimization
-        #@order.brute_force_assign_phones
       end
       @order
     rescue ActiveRecord::StatementInvalid
@@ -70,6 +67,15 @@ class Order < ActiveRecord::Base
     end
 
     @orders = Order.find(@ids)
+  end
+
+  def mark_verified
+    Order.transaction do
+      @state = EventState.orderVerified
+      @event = Event.create(
+        order_id: self.id,
+        event_state_id: @state.id)
+    end
   end
 
   # gets list of all unverified orders
@@ -150,15 +156,6 @@ class Order < ActiveRecord::Base
       self.phone_ids = @assigned_ids
     end
     @assigned_ids
-  end
-
-  def mark_verified
-    Order.transaction do
-      @state = EventState.orderVerified
-      @event = Event.create(
-        order_id: self.id,
-        event_state_id: @state.id)
-    end
   end
 
 end

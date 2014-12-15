@@ -1,6 +1,6 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
+generic:
   inventory_id: 1
   MEID: MyText
   ICCID: MyText
@@ -9,13 +9,3 @@ one:
   last_imaged: 2014-11-03
   active: true
   provider_id:
-
-two:
-  inventory_id: 2
-  MEID: MyText
-  ICCID: MyText
-  phone_num: MyText
-  notes: MyText
-  last_imaged: 2014-11-03
-  active: true
-  provider_id:  

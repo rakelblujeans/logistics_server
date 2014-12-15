@@ -12,21 +12,21 @@ class PhoneTest < ActiveSupport::TestCase
   end
 
   test "upcoming orders" do
-  	@phone = create_phone(phones(:one))
+  	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:upcoming_order))
   	@phone.orders << @order
   	@orders = @phone.upcoming_orders
   	assert @orders.length == 1
 
-  	@phone = create_phone(phones(:two))
+  	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:current_order))
   	@phone.orders << @order
   	@orders = @phone.upcoming_orders
   	assert @orders.length == 0
   end
 
-  test "incoming on" do
-  	@phone = create_phone(phones(:one))
+  test "incoming today" do
+  	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:incoming_today))
   	@phone.orders << @order
   	@order.mark_verified
@@ -37,8 +37,19 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @orders.length == 1
   end
 
-  test "outbound on" do
-  	@phone = create_phone(phones(:one))
+  test "not incoming today" do
+  	 @phone = create_phone(phones(:generic))
+  	@order = create_order(orders(:not_incoming_today))
+  	@phone.orders << @order
+  	@order.mark_verified
+		@ship = create_shipment(shipments(:not_incoming_today), @order, @phone)
+  	@order.shipments << @ship
+
+  	@orders = Phone.incoming_on(Date.today)
+  end
+
+  test "outbound today" do
+  	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:outbound_today))
   	@phone.orders << @order
   	@order.mark_verified
@@ -47,8 +58,18 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @orders.length == 1
   end
 
+  test "not outbound today" do
+  	@phone = create_phone(phones(:generic))
+  	@order = create_order(orders(:not_outbound_today))
+  	@phone.orders << @order
+  	@order.mark_verified
+
+  	@orders = Phone.outbound_on(Date.today)
+  	assert @orders.length == 0
+  end
+
   test "current order" do
-  	@phone = create_phone(phones(:one))
+  	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:current_order))
   	@phone.orders << @order
 
@@ -56,8 +77,26 @@ class PhoneTest < ActiveSupport::TestCase
   	assert_not_nil @order
 	end
 
+	test "not a current order 1" do
+  	@phone = create_phone(phones(:generic))
+  	@order = create_order(orders(:not_current_order_1))
+  	@phone.orders << @order
+
+  	@order = @phone.current_order
+  	assert_nil @order
+	end
+
+	test "not a current order 2" do
+  	@phone = create_phone(phones(:generic))
+  	@order = create_order(orders(:not_current_order_2))
+  	@phone.orders << @order
+
+  	@order = @phone.current_order
+  	assert_nil @order
+	end
+
 	test "check in" do
-		@phone = create_phone(phones(:one))
+		@phone = create_phone(phones(:generic))
   	@event = Phone.check_in(@phone.id)
   	assert @event.phone.id == @phone.id
 	end

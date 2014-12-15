@@ -40,6 +40,7 @@ class OrdersController < ApplicationController
     params[:arrival_date].sub! "/", "-"
     params[:departure_date].sub! "/", "-"
     @order = Order.addNew(order_params)
+    @order.brute_force_assign_phones
     respond_to do |format|
       if @order
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
