@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   get 'orders/unverified'         => 'orders#unverified'
   get 'orders/verified'           => 'orders#verified'
   post 'orders/assign_device'     => 'orders#assign_device'
-  delete 'orders/unassign_device' => 'orders#unassign_device'
+  post 'orders/unassign_device'   => 'orders#unassign_device'
   post 'orders/mark_verified'     => 'orders#mark_verified'
   resources :orders
 

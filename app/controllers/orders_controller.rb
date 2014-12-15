@@ -1,46 +1,33 @@
 class OrdersController < ApplicationController
-  before_action :set_order, only: [:show, :edit, :update, :destroy]
+  before_action :set_order, only: [:show, :edit, :update, :destroy, :mark_verified, :assign_device, :unassign_device]
 
-  # GET /orders
   # GET /orders.json
   def index
     @orders = Order.all
   end
 
-  # GET /orders/1
   # GET /orders/1.json
   def show
-  end
-
-  # GET /orders/unmatched
-  def unverified
-    @orders = Order.unverified
-  end
-
-  def verified
-    @orders = Order.verified
-    respond_to do |format|
-      #format.html { render @order, notice: 'Order was successfully created.' }
-      format.json { render :index, status: :ok, location: @order }
-    end
   end
 
   # GET /orders/new
   def new
     @order = Order.new
+    respond_with @order
   end
 
   # GET /orders/1/edit
   def edit
+    respond_with @order
   end
 
-  # POST /orders
   # POST /orders.json
   def create
-    params[:arrival_date].sub! "/", "-"
-    params[:departure_date].sub! "/", "-"
+    #params[:arrival_date].gsub! "/", "-"
+    #params[:departure_date].gsub! "/", "-"
     @order = Order.addNew(order_params)
     @order.brute_force_assign_phones
+=begin
     respond_to do |format|
       if @order
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
@@ -50,11 +37,17 @@ class OrdersController < ApplicationController
         format.json { render json: @order.errors, status: :unprocessable_entity }
       end
     end
+=end
+    if @order
+      respond_with @order, :status => :created, :location => @order
+    else
+      respond_with @order, :status => :unprocessable_entity
+    end
   end
 
-  # PATCH/PUT /orders/1
   # PATCH/PUT /orders/1.json
   def update
+=begin
     respond_to do |format|
       if @order.update(order_params)
         
@@ -67,59 +60,65 @@ class OrdersController < ApplicationController
         format.json { render json: @order.errors, status: :unprocessable_entity }
       end
     end
+=end
+  if @order.update(order_params)
+      respond_with @order, :status => :ok, :location => @order
+    else 
+      respond_with @order, :status => :unprocessable_entity
+    end
   end
 
-  # DELETE /orders/1
   # DELETE /orders/1.json
   def destroy
     @order.destroy
-    respond_to do |format|
-      format.html { redirect_to orders_url, notice: 'Order was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    #respond_to do |format|
+    #  format.html { redirect_to orders_url, notice: 'Order was successfully destroyed.' }
+    #  format.json { head :no_content }
+    #end
+    respond_with :head => :no_content
   end
 
-  # POST orders/assign_device
-  def assign_device
-    @order = Order.where(id: params[:order_id]).first!
-    @order.assign_device(params[:phone_id])
-  rescue ActiveRecord::RecordNotFound
-    # TODO: log internally. don't show client facing message.
-  ensure
-    respond_to do |format|
-        format.html { redirect_to @order, notice: 'Device was successfully assigned.' }
-        format.json { render :show, status: :ok, location: @order }
-      #else
-      #  format.html { render :new }
-      #  format.json { render json: @order.errors, status: :unprocessable_entity }
-      #end
-    end
-  end
-
-  # DELETE orders/unassign_device.json
-  def unassign_device
-    @order = Order.where(id: params[:order_id]).first!
-    @order.unassign_device(params[:phone_id])
-  rescue ActiveRecord::RecordNotFound
-    # TODO: log internally. don't show client facing message.
-  ensure
-    respond_to do |format|
-      format.html { redirect_to @order, notice: 'Device removed from order' }
-      format.json { render :show, status: :ok, location: @order }
-    end
+  # GET /orders/unmatched
+  def unverified
+    @orders = Order.unverified
+    #respond_with @orders
+    render 'index'
   end
 
   # POST /orders/mark_verified.json
   def mark_verified
     # TODO: error checking
-    @order = Order.where(id: params[:order_id]).first!
     @order.mark_verified
+    @order    
   rescue ActiveRecord::RecordNotFound
+    # TODO
   ensure
-    respond_to do |format|
-      format.html { redirect_to @order, notice: 'Order successfully verified' }
-      format.json { render :show, status: :ok, location: @order }
-    end
+    render 'show'
+  end
+
+  def verified
+    @orders = Order.verified
+    render 'index'
+  end
+
+  # POST orders/assign_device
+  def assign_device
+    @order.assign_device(params[:phone_id])
+    @order
+  rescue ActiveRecord::RecordNotFound
+    # TODO: log internally. don't show client facing message.
+  ensure
+      render 'show'
+  end
+
+  # DELETE orders/unassign_device.json
+  def unassign_device
+    @order.unassign_device(params[:phone_id])
+    @order
+  rescue ActiveRecord::RecordNotFound
+    # TODO: log internally. don't show client facing message.
+  ensure
+    render 'show'
   end
 
   private

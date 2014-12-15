@@ -46,7 +46,6 @@ class Order < ActiveRecord::Base
     if attributes.is_a?(Array)
       attributes.collect { |attr| self.addNewHelper(attr) }
     else
-      #puts "**** #{@attributes.inspect}"
       object = self.addNewHelper(attributes)
       yield(object) if block_given?
       object
@@ -135,7 +134,7 @@ class Order < ActiveRecord::Base
       # get list of available phones, assign all open slots
       @phones = Phone.available_inventory(self.arrival_date, self.departure_date)
       if @phones.empty?
-        logger.debug "No phones available!"
+        logger.error "No phones available!"
         return []
       end
 

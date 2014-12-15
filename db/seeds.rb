@@ -111,6 +111,7 @@ order1 = Order.addNew({
 	customer: c1,
 	active: true
 	});
+order1.brute_force_assign_phones
 
 order2 = Order.addNew({
 	invoice_id: '456',
@@ -130,6 +131,7 @@ order2 = Order.addNew({
 	customer: c1,
 	active: true
 	});
+order2.brute_force_assign_phones
 
 order3 = Order.addNew({
 	invoice_id: '789',
@@ -149,6 +151,7 @@ order3 = Order.addNew({
 	customer: c1,
 	active: true
 	});
+order3.brute_force_assign_phones
 
 card1 = CreditCard.create({last4:'1234', bt_id: 'X123Z02', customer: c1, active: true});
 

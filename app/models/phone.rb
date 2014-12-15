@@ -26,7 +26,7 @@ class Phone < ActiveRecord::Base
       end
       @phone
     rescue ActiveRecord::StatementInvalid
-      return nil
+      return @phone
     end
   end
 
@@ -178,7 +178,8 @@ class Phone < ActiveRecord::Base
       event_state: @estate,
       phone_id: @phone.id]
     @event = Event.create(@event_params)
-    return @event[0] ? true : false
+
+    return @phone
   end
 
 end

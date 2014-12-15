@@ -99,7 +99,7 @@ class PhoneTest < ActiveSupport::TestCase
 
 	test "check in works" do
 		@phone = create_phone(phones(:generic))
-  	@event = Phone.check_in(@phone.id)
-  	assert @event.phone.id == @phone.id
+  	@phone = Phone.check_in(@phone.id)
+  	assert_not_nil @phone
 	end
 end

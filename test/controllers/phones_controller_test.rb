@@ -38,7 +38,6 @@ class PhonesControllerTest < ActionController::TestCase
 
   test "should update phone" do
     patch :update, :format => :json, id: @phone, phone: @phone.attributes
-    #assert_redirected_to phone_path(assigns(:phone))
     assert_response :success
   end
 
@@ -47,7 +46,6 @@ class PhonesControllerTest < ActionController::TestCase
       delete :destroy, :format => :json, id: @phone
     end
 
-    #assert_redirected_to phones_path
     assert_response :success
   end
 
@@ -81,7 +79,8 @@ class PhonesControllerTest < ActionController::TestCase
   test "should check in a phone" do
     post :check_in, :format => :json, id: @phone
     assert_response :success
-    assert_equal assigns(:was_successful), true
+    assert_equal assigns(:phone), @phone
     # TODO could expand with more tests here
   end
+
 end

@@ -2,48 +2,50 @@ require 'test_helper'
 
 class ShipmentsControllerTest < ActionController::TestCase
   setup do
-    @shipment = shipments(:one)
+    @shipment = shipments(:incoming_today)
   end
 
   test "should get index" do
-    get :index
+    get :index, :format => :json
     assert_response :success
     assert_not_nil assigns(:shipments)
   end
 
   test "should get new" do
-    get :new
+    get :new, :format => :json
     assert_response :success
   end
 
   test "should create shipment" do
     assert_difference('Shipment.count') do
-      post :create, shipment: {  }
+      post :create, :format => :json, shipment: @shipment.attributes
     end
 
-    assert_redirected_to shipment_path(assigns(:shipment))
+    body = JSON.parse(response.body)
+    assert body["delivery_out_code"] == @shipment.delivery_out_code
+    assert_response :created
   end
 
   test "should show shipment" do
-    get :show, id: @shipment
+    get :show, :format => :json, id: @shipment
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, id: @shipment
+    get :edit, :format => :json, id: @shipment
     assert_response :success
   end
 
   test "should update shipment" do
-    patch :update, id: @shipment, shipment: {  }
-    assert_redirected_to shipment_path(assigns(:shipment))
+    patch :update, :format => :json, id: @shipment, shipment: @shipment.attributes
+    assert_response :success
   end
 
   test "should destroy shipment" do
     assert_difference('Shipment.count', -1) do
-      delete :destroy, id: @shipment
+      delete :destroy, :format => :json, id: @shipment
     end
 
-    assert_redirected_to shipments_path
+    assert_response :success
   end
 end

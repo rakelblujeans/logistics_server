@@ -1,13 +1,11 @@
 class ShipmentsController < ApplicationController
   before_action :set_shipment, only: [:show, :edit, :update, :destroy]
 
-  # GET /shipments
   # GET /shipments.json
   def index
     @shipments = Shipment.all
   end
 
-  # GET /shipments/1
   # GET /shipments/1.json
   def show
   end
@@ -15,13 +13,14 @@ class ShipmentsController < ApplicationController
   # GET /shipments/new
   def new
     @shipment = Shipment.new
+    respond_with @shipment
   end
 
   # GET /shipments/1/edit
   def edit
+    respond_with @shipment
   end
 
-  # POST /shipments
   # POST /shipments.json
   def create
     @shipment = Shipment.addNew(shipment_params)
@@ -36,7 +35,6 @@ class ShipmentsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /shipments/1
   # PATCH/PUT /shipments/1.json
   def update
     respond_to do |format|
@@ -50,7 +48,6 @@ class ShipmentsController < ApplicationController
     end
   end
 
-  # DELETE /shipments/1
   # DELETE /shipments/1.json
   def destroy
     @shipment.destroy
