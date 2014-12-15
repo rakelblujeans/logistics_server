@@ -178,7 +178,7 @@ class Phone < ActiveRecord::Base
       event_state: @estate,
       phone_id: @phone.id]
     @event = Event.create(@event_params)
-    @event[0]
+    return @event[0] ? true : false
   end
 
 end

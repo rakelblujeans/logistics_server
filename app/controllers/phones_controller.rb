@@ -1,5 +1,8 @@
 class PhonesController < ApplicationController
+  respond_to :json
+  before_filter :check_format
   before_action :set_phone, only: [:show, :edit, :update, :destroy, :upcoming_orders]
+  
 
   # GET /phones
   # GET /phones.json
@@ -15,10 +18,12 @@ class PhonesController < ApplicationController
   # GET /phones/new
   def new
     @phone = Phone.new
+    respond_with @phone
   end
 
   # GET /phones/1/edit
   def edit
+    respond_with @phone
   end
 
   # POST /phones
@@ -70,9 +75,10 @@ class PhonesController < ApplicationController
   # GET /phones/1/upcoming_orders.json
   def upcoming_orders
     @orders = @phone.upcoming_orders
-    #respond_to do |format|
-    #format.html { redirect_to @phone }
-    #format.json { render :show, status: :ok, location: @phone }
+    respond_to do |format|
+      format.html { redirect_to(order_path) }
+      format.json { render json: @orders, status: :ok }
+    end
   end
 
   # GET /phones/1/current_order.json
@@ -80,8 +86,8 @@ class PhonesController < ApplicationController
     @phone = Phone.find(params[:id])
     @orders = @phone.current_order
     respond_to do |format|
-      #format.html { redirect_to @phone }
-      format.json { render :upcoming_orders, status: :ok, location: @phone }
+      #format.html { render "order" @phone }
+      format.json { render :upcoming_orders, status: :ok}
     end
   end
 
@@ -90,7 +96,7 @@ class PhonesController < ApplicationController
     @phones = Phone.incoming_on(params[:date])
     respond_to do |format|
       #format.html { redirect_to @phone }
-      format.json { render :index, status: :ok, location: @phone }
+      format.json { render :index, status: :ok}
     end
   end
 
@@ -99,13 +105,15 @@ class PhonesController < ApplicationController
     @phones = Phone.outbound_on(params[:date])
     respond_to do |format|
       #format.html { redirect_to @phone }
-      format.json { render :index, status: :ok, location: @phone }
+      format.json { render :index, status: :ok }
     end
   end
 
   # POST
   def check_in
     @was_successful = Phone.check_in(params[:id])
+    #respond_with { status: :created, location: @phone }
+    render :json => {was_successful: @was_successful, status: :ok}
   end
 
   private
@@ -119,5 +127,9 @@ class PhonesController < ApplicationController
     def phone_params
       params.require(:phone).permit(:active, :inventory_id, :MEID, :ICCID, :phone_num, 
         :notes, :last_imaged, :provider_id, :start_date, :end_date, :phone_id, :order_id)
+    end
+
+    def check_format
+      render :nothing => true, :status => 406 unless params[:format] == 'json' || request.headers["Accept"] =~ /json/
     end
 end

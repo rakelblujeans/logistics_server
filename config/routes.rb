@@ -26,9 +26,10 @@ Rails.application.routes.draw do
   #get 'phones/assigned_inventory/:order_id'  => 'phones#assigned_inventory'
   get 'phones/available_inventory' => 'phones#available_inventory'
   get 'phones/:id/upcoming_orders' => 'phones#upcoming_orders'
-  get 'phones/:id/current_order' => 'phones#current_order'
+  get 'phones/:id/current_order'   => 'phones#current_order'
   get 'phones/incoming_on'         => 'phones#incoming_on'
   get 'phones/outbound_on'         => 'phones#outbound_on'
+  post 'phones/check_in'           => 'phones#check_in'
   resources :phones
 
   resources :providers
