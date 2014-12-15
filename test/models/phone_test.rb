@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PhoneTest < ActiveSupport::TestCase
 
-  test "available inventory" do
+  test "available inventory is listed" do
 		@arrival_date = Date.today
 		@departure_date = Date.today + 3
 
@@ -11,13 +11,15 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @phones.length == @all_phones.length
   end
 
-  test "upcoming orders" do
+  test "upcoming orders is true" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:upcoming_order))
   	@phone.orders << @order
   	@orders = @phone.upcoming_orders
   	assert @orders.length == 1
+	end
 
+	test "upcoming order is false" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:current_order))
   	@phone.orders << @order
@@ -25,7 +27,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @orders.length == 0
   end
 
-  test "incoming today" do
+  test "order incoming today is true" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:incoming_today))
   	@phone.orders << @order
@@ -37,7 +39,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @orders.length == 1
   end
 
-  test "not incoming today" do
+  test "order incoming today if false" do
   	 @phone = create_phone(phones(:generic))
   	@order = create_order(orders(:not_incoming_today))
   	@phone.orders << @order
@@ -48,7 +50,7 @@ class PhoneTest < ActiveSupport::TestCase
   	@orders = Phone.incoming_on(Date.today)
   end
 
-  test "outbound today" do
+  test "outbound order today is true" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:outbound_today))
   	@phone.orders << @order
@@ -58,7 +60,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @orders.length == 1
   end
 
-  test "not outbound today" do
+  test "outbound order today is false" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:not_outbound_today))
   	@phone.orders << @order
@@ -68,7 +70,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert @orders.length == 0
   end
 
-  test "current order" do
+  test "current order is true" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:current_order))
   	@phone.orders << @order
@@ -77,7 +79,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert_not_nil @order
 	end
 
-	test "not a current order 1" do
+	test "current order is false 1" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:not_current_order_1))
   	@phone.orders << @order
@@ -86,7 +88,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert_nil @order
 	end
 
-	test "not a current order 2" do
+	test "current order is false 2" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:not_current_order_2))
   	@phone.orders << @order
@@ -95,7 +97,7 @@ class PhoneTest < ActiveSupport::TestCase
   	assert_nil @order
 	end
 
-	test "check in" do
+	test "check in works" do
 		@phone = create_phone(phones(:generic))
   	@event = Phone.check_in(@phone.id)
   	assert @event.phone.id == @phone.id

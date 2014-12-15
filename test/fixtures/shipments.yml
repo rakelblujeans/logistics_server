@@ -1,0 +1,31 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+incoming_today:
+  delivery_out_code: 123
+  hand_delivered_by: Raquel
+  delivery_return_code: 456
+  qty: 1
+  active: 1
+  out_on_date: <%= Date.today - 10 %>
+  order_id:
+  delivery_type:
+
+not_incoming_today:
+  delivery_out_code: 123
+  hand_delivered_by: Raquel
+  delivery_return_code: 456
+  qty: 1
+  active: 1
+  out_on_date: <%= Date.today + 1 %>
+  order_id:
+  delivery_type:
+
+outbound_today:
+  delivery_out_code: 456
+  hand_delivered_by: Raquel2
+  delivery_return_code: 789
+  qty: 1
+  active: 1
+  out_on_date: <%= Date.today %>
+  order_id:
+  delivery_type:
