@@ -94,6 +94,9 @@
 	active: true})
 =end
 
+# estimated time spent in transit during delivery
+@lead_time = 3;
+
 # this order is outbound tomorrow
 @order1 = Order.addNew({
 	invoice_id: 'XYZ123',
@@ -138,8 +141,7 @@
 	})
 @order2.brute_force_assign_phones
 @order2.mark_verified
-@lead_time = 3;
-@shipment1 = Shipment.addNew({
+@shipment2 = Shipment.addNew({
 	active: true,
 	delivery_out_code: "1Z9999999999999999",
 	delivery_return_code: "1Z9999999999999999",
@@ -147,6 +149,7 @@
 	order_id: @order2.id
 	})
 
+# this is a current order
 @order3 = Order.addNew({
 	invoice_id: '789SDF',
 	delivery_type_str: 'residential',
@@ -166,6 +169,56 @@
 	active: true
 	})
 @order3.brute_force_assign_phones
+@order3.mark_verified
+@shipment3 = Shipment.addNew({
+	active: true,
+	delivery_out_code: "1Z9999999999999999",
+	delivery_return_code: "1Z9999999999999999",
+	out_on_date: @order3.arrival_date - @lead_time,
+	order_id: @order3.id
+	})
+
+
+@order4 = Order.addNew({
+	invoice_id: '789SDF',
+	delivery_type_str: 'residential',
+	full_address: '456 Main St',
+	shipping_name: 'Patsy Fonseca',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '67890',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: Date.today + 10,
+	departure_date: Date.today + 14,
+	language: 'en',
+	num_phones: 4,
+	#customer: @c1,
+	active: true
+	})
+@order4.brute_force_assign_phones
+
+@order5 = Order.addNew({
+	invoice_id: '789SDF',
+	delivery_type_str: 'residential',
+	full_address: '456 Main St',
+	shipping_name: 'Billy Bob',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '67890',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: Date.today + 16,
+	departure_date: Date.today + 20,
+	language: 'en',
+	num_phones: 4,
+	#customer: @c1,
+	active: true
+	})
+@order5.brute_force_assign_phones
+
 
 =begin
 @card1 = CreditCard.create({last4:'1234', bt_id: 'X123Z02', customer: @c1, active: true});

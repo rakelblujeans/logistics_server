@@ -125,6 +125,7 @@ class OrdersController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_order
       @order = Order.find(params[:id])
+      @is_verified = @order.is_verified
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

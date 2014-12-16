@@ -19,6 +19,17 @@ class OrderTest < ActiveSupport::TestCase
   	assert Order.verified.length == 1
   end
 
+  test "is_verified marks verified orders as true" do
+    @order = create_order(orders(:generic))
+    @order.mark_verified
+    assert_equal @order.is_verified, true
+  end
+
+  test "is_verified marks unverified orders as false" do
+    @order = create_order(orders(:generic))
+    assert_equal @order.is_verified, false
+  end
+
   test "assign device" do
   	@phone = create_phone(phones(:generic))
   	@order = create_order(orders(:generic))

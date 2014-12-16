@@ -33,6 +33,7 @@ class OrdersControllerTest < ActionController::TestCase
   test "should show order" do
     get :show, :format => :json, id: @order
     assert_response :success
+    assert_not_nil assigns(:is_verified)
   end
 
   test "should get edit" do

@@ -83,8 +83,9 @@ class Phone < ActiveRecord::Base
   def upcoming_orders
     @upcoming_orders = []
     today = Date.today
+    @transit_time = 3
     self.orders.each do |order|
-      if order.arrival_date > today
+      if order.arrival_date > today + @transit_time
         @upcoming_orders << order
       end
     end

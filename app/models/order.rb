@@ -73,12 +73,21 @@ class Order < ActiveRecord::Base
   end
 
   def mark_verified
-    Order.transaction do
-      @state = EventState.orderVerified
-      @event = Event.create(
-        order_id: self.id,
-        event_state_id: @state.id)
-    end
+    @state = EventState.orderVerified
+    @event = Event.create(
+      order_id: self.id,
+      event_state_id: @state.id)
+  end
+
+  def is_verified
+    @state = EventState.orderVerified
+    @event = Event.where(
+      order_id: self.id,
+      event_state_id: @state.id).first!
+    #logger.debug "**** IS VER**** #{@event.inspect}"
+    return true
+  rescue ActiveRecord::RecordNotFound
+    return false
   end
 
   # gets list of all unverified orders
