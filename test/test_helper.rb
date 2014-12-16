@@ -25,8 +25,8 @@ class ActiveSupport::TestCase
 		# create a shipment using our addNew()
   	@params = shipment_fixture.attributes
 		@params.delete("id")
-		@params["order_id"] = order.id
-		@params["phone_ids"] = [phone.id]
+		@params[:order_id] = order.id
+		@params[:phone_ids] = [phone.id]
   	@ship = Shipment.addNew(@params)
   	@ship
   end

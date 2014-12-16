@@ -51,10 +51,12 @@ class Phone < ActiveRecord::Base
 
     # convert date objects into strings
     if self.date? in_start
+      in_start.change({ hour: 0, min: 0, sec: 0 })
       in_start = in_start.strftime("%Y-%m-%d")
     end
 
     if self.date? in_end
+      in_end.change({ hour: 0, min: 0, sec: 0 })
       in_end = in_end.strftime("%Y-%m-%d")
     end
 
@@ -80,8 +82,7 @@ class Phone < ActiveRecord::Base
 
   def upcoming_orders
     @upcoming_orders = []
-
-    today = Time.now.utc
+    today = Date.today
     self.orders.each do |order|
       if order.arrival_date > today
         @upcoming_orders << order
@@ -98,6 +99,7 @@ class Phone < ActiveRecord::Base
       in_date.gsub! "/", "-"
       in_date = Date.strptime(in_date, "%Y-%m-%d")
     end
+    in_date.change({ hour: 0, min: 0, sec: 0 })
 
     # [date customer sent out phone] + [time spent in transit] 
     # = estimated arrival date in our office
@@ -125,18 +127,24 @@ class Phone < ActiveRecord::Base
 
   # what phones leave our office on this date?
   def self.outbound_on(in_date)
+    #logger.debug "IN DATE: #{in_date}"
     # if string, convert to date object
     if self.string? in_date
       in_date.gsub! "/", "-"
       in_date = Date.strptime(in_date, "%Y-%m-%d")
+      #in_date.change({ hour: 0, min: 0, sec: 0 })
     end
+    #in_date = in_date.utc
+    #in_date.change({ hour: 0, min: 0, sec: 0 })
 
     # [date customer needs phone] - [time spent in transit] 
     # = estimated departure date from our office
     @leading_transit_time = 3
     @real_date = in_date + @leading_transit_time
+    #logger.debug "**** #{in_date} #{@real_date}"
 
     # convert back to string
+    @real_date.change({ hour: 0, min: 0, sec: 0 })
     @real_date = @real_date.strftime("%Y-%m-%d")
 
     # only consider orders that we have manually verified
@@ -144,14 +152,19 @@ class Phone < ActiveRecord::Base
     @event_order_verified = EventState.orderVerified
     @order_ids = []
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    #logger.debug "**** #{@events.inspect}"
 
     @events.each do |event|
       if event.event_state_id == @event_order_verified.id
         @order_ids << event.order_id
       end
     end
+    #logger.debug "**** ORDER IDS #{@order_ids.inspect}" # , arrival_date: @real_date
+    @os = Order.joins(:phones).where(id: @order_ids)
+    @phone_ids = Order.joins(:phones).where(id: @order_ids)
+    .where('arrival_date == DATE(?)', @real_date).pluck(:phone_id)
 
-    @phone_ids = Order.joins(:phones).where(id: @order_ids, arrival_date: @real_date).pluck(:phone_id)
+    #logger.debug "**** IDS #{@phone_ids.inspect}"
     @phones = Phone.where(id: @phone_ids)
   end
 

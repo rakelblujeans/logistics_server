@@ -30,9 +30,9 @@ current_order:
   shipping_apt_suite: MyText
   shipping_notes: MyText
   arrival_date: <%= Date.today - 7 %>
-  departure_date: <%= Date.today - 2 %>
+  departure_date: <%= Date.today + 7 %>
   language: MyText
-  num_phones: 3
+  num_phones: 2
   active: true
 
 not_current_order_1:
@@ -83,7 +83,7 @@ incoming_today:
   arrival_date: <%= Date.today - 10 %>
   departure_date: <%= Date.today - 3 %>
   language: MyText
-  num_phones: 3
+  num_phones: 2
   active: true
 
 not_incoming_today:

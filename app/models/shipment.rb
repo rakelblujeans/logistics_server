@@ -8,30 +8,33 @@ class Shipment < ActiveRecord::Base
   	begin
   		@shipment = nil
   		Shipment.transaction do
-		  	if shipment_params["hand_delivered_by"]
+  			shipment_params[:active] = true
+  			
+		  	if shipment_params[:hand_delivered_by]
 		      @delivery_type = DeliveryType.hand_delivery
 		    else
 		      # ex:'1Z9999999999999999'
-		      @delivery_type = DeliveryType.detect(shipment_params["delivery_out_code"])
+		      @delivery_type = DeliveryType.detect(shipment_params[:delivery_out_code])
 		    end
-		    shipment_params["delivery_type_id"] = @delivery_type.id
+		    shipment_params[:delivery_type_id] = @delivery_type.id
 
 		    # TODO: validate ids
-		    @phone_ids = shipment_params["phone_ids"]
+		    @order = Order.find(shipment_params[:order_id])
+		    @phone_ids = @order.phones.map(&:id)
+
 		    @phones = Phone.where(id: @phone_ids).all
-		    shipment_params["qty"] = @phones.length
+		    shipment_params[:qty] = @phones.length
 		    @shipment = Shipment.new(shipment_params)
 		    @shipment.phone_ids = @phones.map(&:id)
 		    @shipment.save
 		    @estate_delivered = EventState.inventoryDelivered
 		    @event = Event.create(
 		      event_state: @estate_delivered,
-		      order_id: shipment_params["order_id"])
-		    # TODO: why not record phone_id here?
+		      order_id: @order.id )
 		  end
 		  @shipment
-		rescue ActiveRecord::StatementInvalid
-      return nil
+		#rescue ActiveRecord::StatementInvalid
+    #  return nil
     end
   end
 

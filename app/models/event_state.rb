@@ -18,7 +18,7 @@ class EventState < ActiveRecord::Base
 	end
 
 	def self.inventoryDelivered
-		return _get_or_create_state("inventory delivered")
+		return _get_or_create_state("out for delivery")
 	end
 
 #	def self.customerReceived

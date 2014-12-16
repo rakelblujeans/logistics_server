@@ -20,13 +20,17 @@ class Order < ActiveRecord::Base
     begin
       @order = nil
       Order.transaction do
-        order_params["active"] = true
+        order_params[:active] = true
 
-        if self.string? order_params["arrival_date"]
-          order_params["arrival_date"].gsub! "/", "-"
+        if self.string? order_params[:arrival_date]
+          order_params[:arrival_date].gsub! "/", "-"
+        #else 
+        #  order_params[:arrival_date].change({ hour: 0, min: 0, sec: 0 })
         end
-        if self.string? order_params["departure_date"]
-          order_params["departure_date"].gsub! "/", "-"
+        if self.string? order_params[:departure_date]
+          order_params[:departure_date].gsub! "/", "-"
+        #else
+        #  order_params[:departure_date].change({ hour: 0, min: 0, sec: 0 })
         end
         @order = Order.new(order_params)
         @order.save

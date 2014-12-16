@@ -50,4 +50,20 @@ class OrderTest < ActiveSupport::TestCase
   	assert @events.length == @order.num_phones
 	end
 
+  test "overlapping orders get assigned different phones" do
+    @phone1 = create_phone(phones(:generic))
+    @phone2 = create_phone(phones(:one))
+    @phone3 = create_phone(phones(:two))
+    @order1 = create_order(orders(:current_order))
+    @order1.brute_force_assign_phones
+
+    @order2 = create_order(orders(:incoming_today))
+    @order2.brute_force_assign_phones
+
+    assert @order1.phones.length == @order1.num_phones
+    assert @order2.phones.length == @order2.num_phones
+    assert_not_equal @order1.phones, @order2.phones
+  end
+
+
 end

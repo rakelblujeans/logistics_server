@@ -3,6 +3,8 @@ require 'test_helper'
 class ShipmentsControllerTest < ActionController::TestCase
   setup do
     @shipment = shipments(:incoming_today)
+    @order = orders(:incoming_today)
+    @shipment.order_id = @order.id
   end
 
   test "should get index" do

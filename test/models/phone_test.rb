@@ -44,6 +44,7 @@ class PhoneTest < ActiveSupport::TestCase
   	@order = create_order(orders(:not_incoming_today))
   	@phone.orders << @order
   	@order.mark_verified
+
 		@ship = create_shipment(shipments(:not_incoming_today), @order, @phone)
   	@order.shipments << @ship
 
