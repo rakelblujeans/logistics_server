@@ -61,7 +61,7 @@ class Phone < ActiveRecord::Base
       #in_date.change({ hour: 0, min: 0, sec: 0 })
     end
 
-    # TODO add padding for lead times
+    # add padding for lead times
     @lead_time = 3
     @start_date = in_start - @lead_time
     @end_date = in_end + @lead_time
