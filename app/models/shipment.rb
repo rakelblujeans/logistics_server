@@ -18,6 +18,7 @@ class Shipment < ActiveRecord::Base
 		    end
 		    shipment_params[:delivery_type_id] = @delivery_type.id
 
+
 		    # TODO: validate ids
 		    @order = Order.find(shipment_params[:order_id])
 
@@ -25,9 +26,11 @@ class Shipment < ActiveRecord::Base
 		    # included in this order, so take the phone ids from the
 		    # parameters passed in.
 		    @phones = Phone.where(id: shipment_params[:phone_ids]).all
+
 		    shipment_params[:qty] = @phones.length
 		    @shipment = Shipment.new(shipment_params)
 		    @shipment.phone_ids = @phones.map(&:id)
+		    #logger.debug "***** #{@shipment.phones.inspect}"
 		    @shipment.save
 		    @estate_delivered = EventState.inventoryDelivered
 		    # TODO: pick one and move forward. don't do both
@@ -41,8 +44,8 @@ class Shipment < ActiveRecord::Base
 		    end
 		  end
 		  @shipment
-		#rescue ActiveRecord::StatementInvalid
-    #  return nil
+		rescue ActiveRecord::StatementInvalid
+      return nil
     end
   end
 

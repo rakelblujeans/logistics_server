@@ -66,17 +66,9 @@ class Phone < ActiveRecord::Base
     @start_date = in_start - @lead_time
     @end_date = in_end + @lead_time
 
-
     # convert date objects into strings
-    #if self.date? in_start
-      #in_start.change({ hour: 0, min: 0, sec: 0 })
-      in_start = in_start.strftime("%Y-%m-%d")
-    #end
-
-    #if self.date? in_end
-      #in_end.change({ hour: 0, min: 0, sec: 0 })
-      in_end = in_end.strftime("%Y-%m-%d")
-    #end
+    in_start = in_start.strftime("%Y-%m-%d")
+    in_end = in_end.strftime("%Y-%m-%d")
     
     @events = Event.joins(:order).group(:phone_id)
     .where("(DATE(?) <= arrival_date AND arrival_date < DATE(?)) OR (DATE(?) <= departure_date AND departure_date < DATE(?))", 
@@ -174,24 +166,37 @@ class Phone < ActiveRecord::Base
     @real_date = @real_date.strftime("%Y-%m-%d")
 
     # only consider orders that we have manually verified
-    # as "shippable"
+    # as "shippable" and orders that may only be partially shipped
     @event_order_verified = EventState.orderVerified
+    @estate_delivered = EventState.inventoryDelivered
     @order_ids = []
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
-    #logger.debug "**** #{@events.inspect}"
 
     @events.each do |event|
-      if event.event_state_id == @event_order_verified.id
+      if event.event_state_id == @event_order_verified.id ||
+        event.event_state_id == @estate_delivered.id
         @order_ids << event.order_id
       end
     end
-    #logger.debug "**** ORDER IDS #{@order_ids.inspect}" # , arrival_date: @real_date
-    @os = Order.joins(:phones).where(id: @order_ids)
-    @phone_ids = Order.joins(:phones).where(id: @order_ids)
-    .where('arrival_date == DATE(?)', @real_date).pluck(:phone_id)
+    
+    @data = []
+    @outbound_orders = Order.joins(:phones).group(:order_id)
+    .where(id: @order_ids)
+    .where('arrival_date == DATE(?)', @real_date).all
+    @outbound_orders.each do |order|
+      @unshippedPhones = Array.new(order.phones.all)
+      order.shipments.each do |shipment|
+        shipment.phones.each do |phone|
+          @unshippedPhones.delete phone
+        end
+      end
+      @data << 
+        { order_id: order.id,
+        invoice_id: order.invoice_id,
+        unshipped_phones: @unshippedPhones}
+    end
 
-    #logger.debug "**** IDS #{@phone_ids.inspect}"
-    @phones = Phone.where(id: @phone_ids)
+    return @data
   end
 
   def current_order

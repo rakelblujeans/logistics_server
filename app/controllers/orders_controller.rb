@@ -121,6 +121,12 @@ class OrdersController < ApplicationController
     render 'show'
   end
 
+  # GET /orders/outbound_on.json
+  def outbound_on
+    @data = Order.outbound_on(params[:date])
+  end
+
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_order

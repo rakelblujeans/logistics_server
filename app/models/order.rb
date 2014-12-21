@@ -1,7 +1,6 @@
 class Order < ActiveRecord::Base
   belongs_to :customer
   has_many :shipments
-  #has_many :phones, through: :shipments
   has_and_belongs_to_many :phones
   has_many :receipts
   has_many :events
@@ -168,6 +167,63 @@ class Order < ActiveRecord::Base
       self.phone_ids = @assigned_ids
     end
     @assigned_ids
+  end
+
+  
+  # what phones leave our office on this date?
+  def self.outbound_on(in_date)
+    #logger.debug "IN DATE: #{in_date}"
+    # if string, convert to date object
+    if self.string? in_date
+      in_date.gsub! "/", "-"
+      in_date = Date.strptime(in_date, "%Y-%m-%d")
+      #in_date.change({ hour: 0, min: 0, sec: 0 })
+    end
+    #in_date = in_date.utc
+    #in_date.change({ hour: 0, min: 0, sec: 0 })
+
+    # [date customer needs phone] - [time spent in transit] 
+    # = estimated departure date from our office
+    @leading_transit_time = 3
+    @real_date = in_date + @leading_transit_time
+    #logger.debug "**** #{in_date} #{@real_date}"
+
+    # convert back to string
+    @real_date.change({ hour: 0, min: 0, sec: 0 })
+    @real_date = @real_date.strftime("%Y-%m-%d")
+
+    # only consider orders that we have manually verified
+    # as "shippable" and orders that may only be partially shipped
+    @event_order_verified = EventState.orderVerified
+    @estate_delivered = EventState.inventoryDelivered
+    @order_ids = []
+    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+
+    @events.each do |event|
+      if event.event_state_id == @event_order_verified.id ||
+        event.event_state_id == @estate_delivered.id
+        @order_ids << event.order_id
+      end
+    end
+    
+    @data = []
+    @outbound_orders = Order.joins(:phones).group(:order_id)
+    .where(id: @order_ids)
+    .where('arrival_date == DATE(?)', @real_date).all
+    @outbound_orders.each do |order|
+      @unshippedPhones = Array.new(order.phones.all)
+      order.shipments.each do |shipment|
+        shipment.phones.each do |phone|
+          @unshippedPhones.delete phone
+        end
+      end
+      @data << 
+        { order_id: order.id,
+        invoice_id: order.invoice_id,
+        unshipped_phones: @unshippedPhones}
+    end
+
+    return @data
   end
 
 end
