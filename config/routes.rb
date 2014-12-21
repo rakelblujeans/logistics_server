@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   post 'orders/assign_device'     => 'orders#assign_device'
   post 'orders/unassign_device'   => 'orders#unassign_device'
   post 'orders/mark_verified'     => 'orders#mark_verified'
+  get 'orders/incoming_on'         => 'orders#incoming_on'
   get 'orders/outbound_on'         => 'orders#outbound_on'
   resources :orders
 
@@ -28,7 +29,6 @@ Rails.application.routes.draw do
   get 'phones/available_inventory' => 'phones#available_inventory'
   get 'phones/:id/upcoming_orders' => 'phones#upcoming_orders'
   get 'phones/:id/current_order'   => 'phones#current_order'
-  get 'phones/incoming_on'         => 'phones#incoming_on'
   post 'phones/check_in'           => 'phones#check_in'
   resources :phones
 

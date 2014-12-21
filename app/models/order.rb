@@ -169,7 +169,55 @@ class Order < ActiveRecord::Base
     @assigned_ids
   end
 
-  
+  # what phones arrive in our office on this date?
+  def self.incoming_on(in_date)
+    # if string, convert to date object
+
+    if self.string? in_date
+      in_date.gsub! "/", "-"
+      in_date = Date.strptime(in_date, "%Y-%m-%d")
+    end
+    in_date.change({ hour: 0, min: 0, sec: 0 })
+    @in_date_bracket = in_date + 1
+    # [date customer sent out phone] + [time spent in transit] 
+    # = estimated arrival date in our office
+    @return_transit_time = 3
+    @departure_date = in_date - @return_transit_time
+
+    # convert back to string
+    @departure_date = @departure_date.strftime("%Y-%m-%d")
+
+    # NOTE: since we are not tracking Fedex/delivery events, 
+    # just go off order's departure date & the fact that we
+    # delivered some inventory. Not optimal!
+    @state_inventory_sent = EventState.inventoryDelivered
+    @order_ids = []
+    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    .where("departure_date = DATE(?)", @departure_date)
+    @events.each do |event|
+      if event.event_state_id == @state_inventory_sent.id
+        @order_ids << event.order_id
+      end
+    end
+
+    @data = []
+    @state_inventory_received = EventState.receivedInventory
+    @received_phone_ids = Event.filterByState(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
+    
+    # these are phones out in the field, due today
+    @orders = Order.joins(:phones).where(id: @order_ids).group(:order_id)
+    @orders.each do |order|
+      # subtract phones that have already been checked back in
+      @incoming_phones = Array.new(order.phones.all)
+      @incoming_phones.delete_if { |phone| @received_phone_ids.include? phone.id }
+      @data << {
+        order_id: order.id,
+        invoice_id: order.invoice_id,
+        incoming_phones: @incoming_phones }
+    end
+    return @data
+  end
+
   # what phones leave our office on this date?
   def self.outbound_on(in_date)
     #logger.debug "IN DATE: #{in_date}"
@@ -220,7 +268,7 @@ class Order < ActiveRecord::Base
       @data << 
         { order_id: order.id,
         invoice_id: order.invoice_id,
-        unshipped_phones: @unshippedPhones}
+        unshipped_phones: @unshippedPhones }
     end
 
     return @data

@@ -66,12 +66,6 @@ class PhonesController < ApplicationController
     render 'orders/index'    
   end
 
-  # GET /phones/incoming_on.json
-  def incoming_on
-    @phones = Phone.incoming_on(params[:date])
-    render 'index'
-  end
-
   # POST /phones/check_in/1.json
   def check_in
     @phones = Phone.check_in(params[:inventory_ids])
