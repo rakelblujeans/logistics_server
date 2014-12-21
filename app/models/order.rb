@@ -84,7 +84,6 @@ class Order < ActiveRecord::Base
     @event = Event.where(
       order_id: self.id,
       event_state_id: @state.id).first!
-    #logger.debug "**** IS VER**** #{@event.inspect}"
     return true
   rescue ActiveRecord::RecordNotFound
     return false
@@ -146,6 +145,7 @@ class Order < ActiveRecord::Base
     Order.transaction do
       # get list of available phones, assign all open slots
       @phones = Phone.available_inventory(self.arrival_date, self.departure_date)
+      #puts "#{@phones.inspect}"
       if @phones.empty?
         logger.error "No phones available!"
         return []

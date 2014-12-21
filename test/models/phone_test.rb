@@ -100,7 +100,7 @@ class PhoneTest < ActiveSupport::TestCase
 
 	test "check in works" do
 		@phone = create_phone(phones(:generic))
-  	@phone = Phone.check_in(@phone.id)
+  	@phone = Phone.check_in([@phone.inventory_id])
   	assert_not_nil @phone
 	end
 end

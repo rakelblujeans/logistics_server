@@ -146,7 +146,9 @@
 	delivery_out_code: "1Z9999999999999999",
 	delivery_return_code: "1Z9999999999999999",
 	out_on_date: @order2.arrival_date - @lead_time,
-	order_id: @order2.id
+	order_id: @order2.id,
+	phone_ids: @order2.phone_ids,
+	qty: @order2.phones.count
 	})
 
 # this is a current order
@@ -175,7 +177,9 @@
 	delivery_out_code: "1Z9999999999999999",
 	delivery_return_code: "1Z9999999999999999",
 	out_on_date: @order3.arrival_date - @lead_time,
-	order_id: @order3.id
+	order_id: @order3.id,
+	phone_ids: @order3.phone_ids,
+	qty: @order3.phones.count
 	})
 
 

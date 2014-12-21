@@ -27,23 +27,23 @@ class PhonesControllerTest < ActionController::TestCase
   end
 
   test "should show phone" do
-    get :show, :format => :json, id: @phone
+    get :show, :format => :json, id: @phone.inventory_id
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, :format => :json, id: @phone
+    get :edit, :format => :json, id: @phone.inventory_id
     assert_response :success
   end
 
   test "should update phone" do
-    patch :update, :format => :json, id: @phone, phone: @phone.attributes
+    patch :update, :format => :json, id: @phone.inventory_id, phone: @phone.attributes
     assert_response :success
   end
 
   test "should destroy phone" do
     assert_difference('Phone.count', -1) do
-      delete :destroy, :format => :json, id: @phone
+      delete :destroy, :format => :json, id: @phone.inventory_id
     end
 
     assert_response :success
@@ -77,9 +77,9 @@ class PhonesControllerTest < ActionController::TestCase
   end
 
   test "should check in a phone" do
-    post :check_in, :format => :json, id: @phone
+    post :check_in, :format => :json, inventory_ids: [@phone.inventory_id]
     assert_response :success
-    assert_equal assigns(:phone), @phone
+    assert_equal assigns(:phones)[0].inventory_id, @phone.inventory_id
     # TODO could expand with more tests here
   end
 

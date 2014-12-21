@@ -117,19 +117,21 @@ class PhonesController < ApplicationController
 
   # POST /phones/check_in/1.json
   def check_in
-    @phone = Phone.check_in(params[:id])
-    respond_with @phone, :status => :ok, location => phones_url
+    @phones = Phone.check_in(params[:inventory_ids])
+    respond_with @phones, :status => :ok, :location => phones_url
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_phone
+      @phone = Phone.where(inventory_id: params[:id]).first!
+    rescue ActiveRecord::RecordNotFound
       @phone = Phone.find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def phone_params
-      params.require(:phone).permit(:active, :inventory_id, :MEID, :ICCID, :phone_num, 
+      params.require(:phone).permit(:active, :inventory_id, :inventory_ids, :MEID, :ICCID, :phone_num, 
         :notes, :last_imaged, :provider_id, :start_date, :end_date, :phone_id, :order_id)
     end
 end

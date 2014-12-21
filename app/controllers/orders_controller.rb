@@ -124,8 +124,15 @@ class OrdersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_order
-      @order = Order.find(params[:id])
-      @is_verified = @order.is_verified
+      @order = Order.where(id: params[:id]).first!
+    rescue ActiveRecord::RecordNotFound
+      @order = Order.where(invoice_id: params[:id]).first!
+    ensure
+      if @order
+        @is_verified = @order.is_verified
+      else
+        @is_verified = false
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

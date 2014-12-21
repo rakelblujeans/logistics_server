@@ -21,6 +21,7 @@ class EventState < ActiveRecord::Base
 		return _get_or_create_state("out for delivery")
 	end
 
+# NOTE: these can be tracked once we integrate a delivery API
 #	def self.customerReceived
 #		return _get_or_create_state("received by customer")
 #	end

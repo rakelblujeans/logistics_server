@@ -20,17 +20,25 @@ class Shipment < ActiveRecord::Base
 
 		    # TODO: validate ids
 		    @order = Order.find(shipment_params[:order_id])
-		    @phone_ids = @order.phones.map(&:id)
 
-		    @phones = Phone.where(id: @phone_ids).all
+		    # we may only be shipping a subset of the phones 
+		    # included in this order, so take the phone ids from the
+		    # parameters passed in.
+		    @phones = Phone.where(id: shipment_params[:phone_ids]).all
 		    shipment_params[:qty] = @phones.length
 		    @shipment = Shipment.new(shipment_params)
 		    @shipment.phone_ids = @phones.map(&:id)
 		    @shipment.save
 		    @estate_delivered = EventState.inventoryDelivered
-		    @event = Event.create(
+		    # TODO: pick one and move forward. don't do both
+		    Event.create(
 		      event_state: @estate_delivered,
 		      order_id: @order.id )
+		    @phones.each do |phone|
+		    	Event.create(
+		      event_state: @estate_delivered,
+		      phone_id: phone.id )
+		    end
 		  end
 		  @shipment
 		#rescue ActiveRecord::StatementInvalid
