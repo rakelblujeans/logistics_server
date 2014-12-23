@@ -59,39 +59,32 @@ class Phone < ActiveRecord::Base
       in_end = Date.strptime(in_end, "%Y-%m-%d")
     end
 
-    # add padding for lead times
-    @lead_time = 3
-    @start_date = in_start - @lead_time
-    @end_date = in_end + @lead_time
-
     # convert date objects into strings
     in_start = in_start.strftime("%Y-%m-%d")
     in_end = in_end.strftime("%Y-%m-%d")
     
-    #puts "checking available btwn #{in_start} #{in_end}"
     #.where("(DATE(?) <= arrival_date AND arrival_date < DATE(?)) OR (DATE(?) <= departure_date AND departure_date < DATE(?))", 
+    #puts "CHECKING BETWEEN #{in_start} #{in_end}"
+    #@events = Event.joins(:order).group(:phone_id)
+    #.where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end)
+    #.having("max(events.updated_at)")
+    @used_phone_ids = Order.joins(:phones).where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end).pluck(:phone_id)
 
-    @events = Event.joins(:order).group(:phone_id)
-    .where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end)
-    .having("max(events.created_at)")
-    #puts "\n**FOUND** #{@events.inspect} #{in_start}"
-    @used_phone_ids = []
-    @state_matched = EventState.matched_inventory
-
-    #puts "#{@events.inspect}"
-    @events.each do |event|
-      if event.event_state_id == @state_matched.id #&&
-        #event.order.departure_date > @start_date
-        @used_phone_ids << event.phone_id
-      end
-    end
+    #puts "\n**FOUND EVENTS** #{@events.inspect}"
+    #@used_phone_ids = []
+    #@state_matched = EventState.matched_inventory
+    #@events.each do |event|
+    #  if event.event_state_id == @state_matched.id
+    #    @used_phone_ids << event.phone_id
+    #  end
+    #end
 
     # return the complement of that set
-    #puts "\nCURRENTLY USED PHONES: #{@used_phone_ids.inspect} BETWEEN #{@start_date} #{@end_date} "
+    #puts "\nCURRENTLY USED PHONES: #{@used_phone_ids.inspect} BETWEEN #{in_start} #{in_end}"
     @phones = Phone.where(active: true);
     #puts "\nACTIVE: #{@phones.ids.inspect}"
     @phones = @phones.where.not(id:@used_phone_ids).order(:inventory_id)
-    #puts "FOUND: #{@phones.ids.inspect}"
+    #puts "FOUND AVAILABLE: #{@phones.ids.inspect}"
     @phones
   end
 
@@ -111,7 +104,7 @@ class Phone < ActiveRecord::Base
 
     # if all phones for this order have been checked in, mark order complete
     # TODO?
-    return @phones
+    @phones
   end
 
   def past_orders
@@ -145,6 +138,7 @@ class Phone < ActiveRecord::Base
   def deactivate
     self.update(active: false);
 
+    #logger.debug "\n\n UPCOMING ORDERS\n#{self.upcoming_orders.inspect}"
     self.upcoming_orders.each do |order|
       if order.unassign_device(self.id)
         order.brute_force_assign_phones

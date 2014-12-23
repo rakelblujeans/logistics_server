@@ -95,29 +95,6 @@
 # estimated time spent in transit during delivery
 @lead_time = 3;
 
-# this order is outbound tomorrow
-@order1 = Order.addNew({
-	invoice_id: 'XYZ123',
-	delivery_type_str: 'residential',
-	full_address: '123 Main St',
-	shipping_name: 'Joe Smith',
-	shipping_city: 'new york',
-	shipping_state: 'NY',
-	shipping_zip: '12345',
-	shipping_country: 'USA',
-	shipping_apt_suite: '4C',
-	shipping_notes: 'leave a note on the door',
-	arrival_date: Date.today + 4,
-	departure_date: Date.today + 7,
-	language: 'en',
-	num_phones: 3,
-	#customer: @c1,
-	active: true
-	})
-@order1.brute_force_assign_phones
-@order1.mark_verified
-
-
 # this order is returning to our office today
 @order2 = Order.addNew({
 	invoice_id: '456FGH',
@@ -149,9 +126,33 @@
 	qty: @order2.phones.count
 	})
 
+# this order is outbound tomorrow
+@order1 = Order.addNew({
+	invoice_id: 'XYZ123',
+	delivery_type_str: 'residential',
+	full_address: '123 Main St',
+	shipping_name: 'Joe Smith',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '12345',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: Date.today + 4,
+	departure_date: Date.today + 7,
+	language: 'en',
+	num_phones: 3,
+	#customer: @c1,
+	active: true
+	})
+@order1.brute_force_assign_phones
+@order1.mark_verified
+
+
+
 # this is a current order
 @order3 = Order.addNew({
-	invoice_id: '789SDF',
+	invoice_id: '789LKO',
 	delivery_type_str: 'residential',
 	full_address: '456 Main St',
 	shipping_name: 'Henry Collins',
@@ -180,27 +181,6 @@
 	qty: @order3.phones.count
 	})
 
-
-@order4 = Order.addNew({
-	invoice_id: '789SDF',
-	delivery_type_str: 'residential',
-	full_address: '456 Main St',
-	shipping_name: 'Patsy Fonseca',
-	shipping_city: 'new york',
-	shipping_state: 'NY',
-	shipping_zip: '67890',
-	shipping_country: 'USA',
-	shipping_apt_suite: '4C',
-	shipping_notes: 'leave a note on the door',
-	arrival_date: Date.today + 10,
-	departure_date: Date.today + 14,
-	language: 'en',
-	num_phones: 4,
-	#customer: @c1,
-	active: true
-	})
-@order4.brute_force_assign_phones
-
 @order5 = Order.addNew({
 	invoice_id: '789SDF',
 	delivery_type_str: 'residential',
@@ -220,6 +200,27 @@
 	active: true
 	})
 @order5.brute_force_assign_phones
+
+@order4 = Order.addNew({
+	invoice_id: '345BUQ',
+	delivery_type_str: 'residential',
+	full_address: '456 Main St',
+	shipping_name: 'Patsy Fonseca',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '67890',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: Date.today + 10,
+	departure_date: Date.today + 14,
+	language: 'en',
+	num_phones: 4,
+	#customer: @c1,
+	active: true
+	})
+@order4.brute_force_assign_phones
+
 
 
 =begin

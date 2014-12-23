@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class OrderTest < ActiveSupport::TestCase
+
   test "unverified order passes unverified check" do
   	@order = create_order(orders(:generic))
   	assert_equal 1, Order.unverified.length
@@ -279,9 +280,17 @@ class OrderTest < ActiveSupport::TestCase
 
     @order1 = create_order(orders(:incoming_today)) # 2 phones
     @order1.brute_force_assign_phones
+
     @order2 = create_order(orders(:outbound_today)) # 2 phones
     @order2.brute_force_assign_phones
 
+
+    
+    @events = Event.joins(:order).group(:phone_id)
+    .where("departure_date >= DATE(?) AND departure_date < DATE(?)", @order1.arrival_date, @order1.departure_date + 3)
+    .having("max(events.created_at)")
+    #puts "\n** ALL EVENTS ** #{@events.inspect}"
+    
     # clear all other data
     @other_orders = Order.where.not(id:[
       @order1.id, 
@@ -291,7 +300,10 @@ class OrderTest < ActiveSupport::TestCase
     @order1_phones = @order1.phone_ids
     @order2_phones = @order2.phone_ids
     assert_equal @order1_phones, @order2_phones
+
+    #puts "\n******************\nMY ORDER IDS: #{@order1.id} #{@order2.id}"
     
+
     @order1.extend(@order2.arrival_date + 1)
     # refresh data
     @order1 = Order.find(@order1.id)
@@ -328,5 +340,7 @@ class OrderTest < ActiveSupport::TestCase
     @exception = assert_raises(RuntimeError) { @order1.extend(@order2.arrival_date + 1) }
     assert_equal "No phones available", @exception.message
   end
+
+  # TODO: add test to check that received phones don't still display as incoming
 
 end

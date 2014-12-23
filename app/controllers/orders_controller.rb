@@ -23,21 +23,9 @@ class OrdersController < ApplicationController
 
   # POST /orders.json
   def create
-    #params[:arrival_date].gsub! "/", "-"
-    #params[:departure_date].gsub! "/", "-"
     @order = Order.addNew(order_params)
     @order.brute_force_assign_phones
-=begin
-    respond_to do |format|
-      if @order
-        format.html { redirect_to @order, notice: 'Order was successfully created.' }
-        format.json { render :show, status: :created, location: @order }
-      else
-        format.html { render :new }
-        format.json { render json: @order.errors, status: :unprocessable_entity }
-      end
-    end
-=end
+
     if @order
       respond_with @order, :status => :created, :location => @order
     else
@@ -71,23 +59,17 @@ class OrdersController < ApplicationController
   # DELETE /orders/1.json
   def destroy
     @order.destroy
-    #respond_to do |format|
-    #  format.html { redirect_to orders_url, notice: 'Order was successfully destroyed.' }
-    #  format.json { head :no_content }
-    #end
     respond_with :head => :no_content
   end
 
   # GET /orders/unmatched
   def unverified
     @orders = Order.unverified
-    #respond_with @orders
     render 'index'
   end
 
   # POST /orders/mark_verified.json
   def mark_verified
-    # TODO: error checking
     @order.mark_verified
     @order    
   rescue ActiveRecord::RecordNotFound

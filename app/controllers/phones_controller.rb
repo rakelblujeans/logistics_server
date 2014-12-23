@@ -72,6 +72,22 @@ class PhonesController < ApplicationController
     respond_with @phones, :status => :ok, :location => phones_url
   end
 
+  # POST /phones/1/toggle_activation.json
+  def toggle_activation
+    @phone = Phone.find(params[:id])
+    if @phone
+      if @phone.active
+        @phone.deactivate
+      else
+        @phone.update(active: true)
+      end
+
+      respond_with @phone, :status => :ok, :location => @phone
+    else
+      respond_with @phone, :status => :unprocessable_entity
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_phone

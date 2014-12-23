@@ -88,11 +88,13 @@ class Order < ActiveRecord::Base
   def self.unverified
     @state_received = EventState.order_received
     @state_matched = EventState.matched_inventory
+    @state_unmatched = EventState.unassigned_inventory
     @ids = []
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
       if event.event_state_id == @state_received.id || 
-        event.event_state_id == @state_matched.id
+        event.event_state_id == @state_matched.id ||
+        event.event_state_id == @state_unmatched.id
         @ids << event.order_id
       end
     end
@@ -132,19 +134,20 @@ class Order < ActiveRecord::Base
 
     @data = []
     @state_inventory_received = EventState.received_inventory
-    @in_date_bracket = in_date + 1
+    @in_date_bracket = Date.today + 1
     @received_phone_ids = Event.filter_phone_events(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
-    
     # these are phones out in the field, due today
     @orders = Order.joins(:phones).where(id: @order_ids).group(:order_id)
     @orders.each do |order|
       # subtract phones that have already been checked back in
       @incoming_phones = Array.new(order.phones.all)
       @incoming_phones.delete_if { |phone| @received_phone_ids.include? phone.id }
-      @data << {
-        order_id: order.id,
-        invoice_id: order.invoice_id,
-        incoming_phones: @incoming_phones }
+      if @incoming_phones.length > 0
+        @data << {
+          order_id: order.id,
+          invoice_id: order.invoice_id,
+          incoming_phones: @incoming_phones }
+      end
     end
     return @data
   end
@@ -171,16 +174,18 @@ class Order < ActiveRecord::Base
     .where(id: @order_ids)
     .where('arrival_date == DATE(?)', @real_date).all
     @outbound_orders.each do |order|
-      @unshippedPhones = Array.new(order.phones.all)
+      @unshipped_phones = Array.new(order.phones.all)
       order.shipments.each do |shipment|
         shipment.phones.each do |phone|
-          @unshippedPhones.delete phone
+          @unshipped_phones.delete phone
         end
       end
-      @data << 
-        { order_id: order.id,
-        invoice_id: order.invoice_id,
-        unshipped_phones: @unshippedPhones }
+      if @unshipped_phones.length > 0
+        @data << 
+          { order_id: order.id,
+          invoice_id: order.invoice_id,
+          unshipped_phones: @unshipped_phones }
+      end
     end
 
     return @data
@@ -308,15 +313,15 @@ class Order < ActiveRecord::Base
   # TODO: not optimal!
   def brute_force_assign_phones
 
-    #TODO: error checking
+    # TODO: error checking
     @assigned_ids = nil
     Order.transaction do
       # get list of available phones, assign all open slots
-      @phones = Phone.available_inventory(self.arrival_date, self.departure_date)
+      @phones = Phone.available_inventory(self.arrival_date-3, self.departure_date+3)
       @phones_idx = 0
-      #puts "AVAILABLE: #{@phones.ids.inspect}"
+      #puts "\n\n **** AVAILABLE[#{self.invoice_id}]: #{@phones.ids.inspect}"
       if @phones.empty?
-        logger.error "No phones available!"
+        #puts "***** No phones available! *****"
         raise "No phones available"
       end
       @assigned_ids = Array.new(self.num_phones)
@@ -334,6 +339,9 @@ class Order < ActiveRecord::Base
             })
 
           @phones_idx += 1
+        else
+          #puts "**** SLOT HAS phone #{self.phones[i].id}"
+          @assigned_ids.push(self.phones[i].id)
         end
       end
       self.phone_ids = @assigned_ids

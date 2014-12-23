@@ -22,16 +22,15 @@ Rails.application.routes.draw do
   post 'orders/mark_verified'     => 'orders#mark_verified'
   get 'orders/incoming_on'        => 'orders#incoming_on'
   get 'orders/outbound_on'        => 'orders#outbound_on'
-  get 'orders/currently_out'         => 'orders#currently_out'
+  get 'orders/currently_out'      => 'orders#currently_out'
   post 'orders/mark_complete'     => 'orders#mark_complete'
   resources :orders
 
-  #get 'phones/inventory_snapshot/:order_id'  => 'phones#inventory_snapshot'
-  #get 'phones/assigned_inventory/:order_id'  => 'phones#assigned_inventory'
-  get 'phones/available_inventory' => 'phones#available_inventory'
-  get 'phones/:id/upcoming_orders' => 'phones#upcoming_orders'
-  get 'phones/:id/current_order'   => 'phones#current_order'
-  post 'phones/check_in'           => 'phones#check_in'
+  get 'phones/available_inventory'    => 'phones#available_inventory'
+  get 'phones/:id/upcoming_orders'    => 'phones#upcoming_orders'
+  get 'phones/:id/current_order'      => 'phones#current_order'
+  post 'phones/check_in'              => 'phones#check_in'
+  put 'phones/:id/toggle_activation'  => 'phones#toggle_activation'
   resources :phones
 
   resources :providers
