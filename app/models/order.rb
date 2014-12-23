@@ -207,18 +207,12 @@ class Order < ActiveRecord::Base
     @order
   end
 
-  def self.currently_out
-    @today = Date.today
+  def self.overdue
+    @events = Event.joins(:order).group(:order_id)
+    .having("max(events.created_at)")
+    .where("date(departure_date, '+3 days') <= DATE(?)", Date.today)
 
-    # NOTE: since we are not tracking Fedex/delivery events, 
-    # just go off order's departure date & the fact that we
-    # delivered some inventory. Not optimal!
-    @state_inventory_sent = EventState.inventory_delivered
     @order_ids = []
-    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
-    .where(
-      "date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') > DATE(?)", 
-      @today, @today)
     @events.each do |event|
       if event.event_state_id == @state_inventory_sent.id
         @order_ids << event.order_id
@@ -226,7 +220,31 @@ class Order < ActiveRecord::Base
     end
 
     @orders = Order.where(id:@order_ids)
-    @orders
+  end
+
+  def self.currently_out
+    # NOTE: since we are not tracking Fedex/delivery events, 
+    # just go off order's departure date & the fact that we
+    # delivered some inventory. Not optimal!
+    @today = Date.today
+    @state_inventory_sent = EventState.inventory_delivered
+    @order_ids = []
+
+    # orders currently out
+    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    .where("date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') > DATE(?)", 
+      @today, @today)
+    
+    @events.each do |event|
+      if event.event_state_id == @state_inventory_sent.id
+        @order_ids << event.order_id
+      end
+    end
+  
+    # orders overdue
+    @order_ids << Order.overdue.pluck(:id)
+
+    @orders = Order.where(id:@order_ids)
   end
 
   # gets ALL orders between these two dates, regardless of state

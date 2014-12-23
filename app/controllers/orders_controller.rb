@@ -124,6 +124,11 @@ class OrdersController < ApplicationController
     @order = Order.mark_complete(params[:invoice_id])
   end
 
+  def overdue
+    @orders = Order.overdue
+    render 'index'
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_order
