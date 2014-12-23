@@ -13,9 +13,38 @@ class Order < ActiveRecord::Base
     obj.kind_of?(String)
   end
 
+  def self._fix_departure_date(in_date)
+    if self.string? in_date
+      in_date.gsub! "/", "-"
+      in_date = Date.strptime(in_date, "%Y-%m-%d")
+    end
+    @return_transit_time = 3
+    @departure_date = in_date - @return_transit_time
 
-  def self.addNewHelper(order_params)
-    
+    # convert back to string
+    @departure_date = @departure_date.strftime("%Y-%m-%d")
+  end
+
+  def self._fix_arrival_date(in_date)
+    # if string, convert to date object
+    if self.string? in_date
+      in_date.gsub! "/", "-"
+      in_date = Date.strptime(in_date, "%Y-%m-%d")
+    end
+
+    # [date customer needs phone] - [time spent in transit] 
+    # = estimated departure date from our office
+    @leading_transit_time = 3
+    @real_date = in_date + @leading_transit_time
+
+    # convert back to string
+    @real_date.change({ hour: 0, min: 0, sec: 0 })
+    @real_date = @real_date.strftime("%Y-%m-%d")
+  end
+
+#########
+
+  def self.addNewHelper(order_params)  
     begin
       @order = nil
       Order.transaction do
@@ -34,7 +63,7 @@ class Order < ActiveRecord::Base
         @order = Order.new(order_params)
         @order.save
 
-        @state = EventState.orderReceived
+        @state = EventState.order_received
         @event = Event.create(
           event_state: @state,
           order_id: @order.id)
@@ -57,8 +86,8 @@ class Order < ActiveRecord::Base
 
   # gets list of all unverified orders
   def self.unverified
-    @state_received = EventState.orderReceived
-    @state_matched = EventState.matchedInventory
+    @state_received = EventState.order_received
+    @state_matched = EventState.matched_inventory
     @ids = []
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
@@ -71,26 +100,9 @@ class Order < ActiveRecord::Base
     @orders = Order.find(@ids)
   end
 
-  def mark_verified
-    @state = EventState.orderVerified
-    @event = Event.create(
-      order_id: self.id,
-      event_state_id: @state.id)
-  end
-
-  def is_verified
-    @state = EventState.orderVerified
-    @event = Event.where(
-      order_id: self.id,
-      event_state_id: @state.id).first!
-    return true
-  rescue ActiveRecord::RecordNotFound
-    return false
-  end
-
   # gets list of all unverified orders
   def self.verified
-    @state_verified = EventState.orderVerified
+    @state_verified = EventState.order_verified
     @ids = []
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
@@ -102,98 +114,16 @@ class Order < ActiveRecord::Base
     @orders = Order.find(@ids)
   end
 
-  def assign_device(phone_id)
-    Order.transaction do
-      @phone = Phone.where(id: phone_id).first!
-      self.phones << @phone
-
-      @state = EventState.matchedInventory
-      Event.create(
-        event_state_id: @state.id,
-        phone_id: @phone.id,
-        order_id: self.id)
-    end
-    @order
-  end
-
-  def unassign_device(phone_id)
-    Order.transaction do
-      self.phones.each do |phone|
-        if phone.id == phone_id.to_i
-          self.phones.delete(phone)
-          break
-        end
-      end
-
-      # update recorded events
-      @state = EventState.matchedInventory
-      @event = Event.where(
-        order_id: self.id,
-        phone_id: phone_id,
-        event_state_id: @state.id).first!
-      if @event != nil
-        @event.destroy
-      end
-    end
-  end
-
-  # TODO: not optimal!
-  def brute_force_assign_phones
-    #TODO: error checking
-    @assigned_ids = nil
-    Order.transaction do
-      # get list of available phones, assign all open slots
-      @phones = Phone.available_inventory(self.arrival_date, self.departure_date)
-      #puts "#{@phones.inspect}"
-      if @phones.empty?
-        logger.error "No phones available!"
-        return []
-      end
-
-      @assigned_ids = Array.new(self.num_phones)
-      (1..self.num_phones).each do |i|
-        if !self.phones[i]
-          @assigned_ids.push(@phones[i].id)
-
-          # log the event in our history
-          @state = EventState.matchedInventory
-          @event = Event.create({
-              event_state_id: @state.id,
-              phone_id: @phones[i].id,
-              order_id: self.id
-            })
-        end
-      end
-      self.phone_ids = @assigned_ids
-    end
-    @assigned_ids
-  end
-
   # what phones arrive in our office on this date?
   def self.incoming_on(in_date)
-    # if string, convert to date object
-
-    if self.string? in_date
-      in_date.gsub! "/", "-"
-      in_date = Date.strptime(in_date, "%Y-%m-%d")
-    end
-    in_date.change({ hour: 0, min: 0, sec: 0 })
-    @in_date_bracket = in_date + 1
-    # [date customer sent out phone] + [time spent in transit] 
-    # = estimated arrival date in our office
-    @return_transit_time = 3
-    @departure_date = in_date - @return_transit_time
-
-    # convert back to string
-    @departure_date = @departure_date.strftime("%Y-%m-%d")
-
+    @departure_date = self._fix_departure_date(in_date)
+    #
     # NOTE: since we are not tracking Fedex/delivery events, 
     # just go off order's departure date & the fact that we
     # delivered some inventory. Not optimal!
-    @state_inventory_sent = EventState.inventoryDelivered
+    @state_inventory_sent = EventState.inventory_delivered
     @order_ids = []
-    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
-    .where("departure_date = DATE(?)", @departure_date)
+    @events = Event.filter_order_events(@state_inventory_sent, @departure_date)
     @events.each do |event|
       if event.event_state_id == @state_inventory_sent.id
         @order_ids << event.order_id
@@ -201,8 +131,9 @@ class Order < ActiveRecord::Base
     end
 
     @data = []
-    @state_inventory_received = EventState.receivedInventory
-    @received_phone_ids = Event.filterByState(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
+    @state_inventory_received = EventState.received_inventory
+    @in_date_bracket = in_date + 1
+    @received_phone_ids = Event.filter_phone_events(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
     
     # these are phones out in the field, due today
     @orders = Order.joins(:phones).where(id: @order_ids).group(:order_id)
@@ -220,30 +151,11 @@ class Order < ActiveRecord::Base
 
   # what phones leave our office on this date?
   def self.outbound_on(in_date)
-    #logger.debug "IN DATE: #{in_date}"
-    # if string, convert to date object
-    if self.string? in_date
-      in_date.gsub! "/", "-"
-      in_date = Date.strptime(in_date, "%Y-%m-%d")
-      #in_date.change({ hour: 0, min: 0, sec: 0 })
-    end
-    #in_date = in_date.utc
-    #in_date.change({ hour: 0, min: 0, sec: 0 })
-
-    # [date customer needs phone] - [time spent in transit] 
-    # = estimated departure date from our office
-    @leading_transit_time = 3
-    @real_date = in_date + @leading_transit_time
-    #logger.debug "**** #{in_date} #{@real_date}"
-
-    # convert back to string
-    @real_date.change({ hour: 0, min: 0, sec: 0 })
-    @real_date = @real_date.strftime("%Y-%m-%d")
-
+    @real_date = self._fix_arrival_date(in_date)
     # only consider orders that we have manually verified
     # as "shippable" and orders that may only be partially shipped
-    @event_order_verified = EventState.orderVerified
-    @estate_delivered = EventState.inventoryDelivered
+    @event_order_verified = EventState.order_verified
+    @estate_delivered = EventState.inventory_delivered
     @order_ids = []
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
 
@@ -272,6 +184,202 @@ class Order < ActiveRecord::Base
     end
 
     return @data
+  end
+
+  def self.mark_complete(invoice_id)
+    @order = Order.where(invoice_id: invoice_id).last!
+    @phones_copy = Array.new(@order.phones_still_out)
+    
+    @phones_copy.each do |phone|
+      Phone.check_in(phone.inventory_id)
+    end
+
+    @state_completed = EventState.order_completed
+    Event.create({
+      event_state_id: @state_completed.id,
+      order_id: @order.id
+      })
+    @order
+  end
+
+  def self.currently_out
+    @today = Date.today
+
+    # NOTE: since we are not tracking Fedex/delivery events, 
+    # just go off order's departure date & the fact that we
+    # delivered some inventory. Not optimal!
+    @state_inventory_sent = EventState.inventory_delivered
+    @order_ids = []
+    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    .where(
+      "date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') > DATE(?)", 
+      @today, @today)
+    @events.each do |event|
+      if event.event_state_id == @state_inventory_sent.id
+        @order_ids << event.order_id
+      end
+    end
+
+    @orders = Order.where(id:@order_ids)
+    @orders
+  end
+
+  # gets ALL orders between these two dates, regardless of state
+  def self.between(date1, date2)
+    # if date object, convert to string
+    if self.date? date1
+      date1 = date1.strftime("%Y-%m-%d")
+    end
+    if self.date? date2
+      date2 = date2.strftime("%Y-%m-%d")
+    end
+
+    @orders = Order.where("(DATE(?) <= date(arrival_date, '-3 days') AND date(arrival_date, '-3 days') < DATE(?)) OR (DATE(?) <= date(departure_date, '+3 days') AND date(departure_date, '+3 days') < DATE(?))",
+      date1, date2, date1, date2)
+  end
+
+#########
+
+  def mark_verified
+    @state = EventState.order_verified
+    @event = Event.create(
+      order_id: self.id,
+      event_state_id: @state.id)
+  end
+
+  def is_verified
+    @state = EventState.order_verified
+    @event = Event.where(
+      order_id: self.id,
+      event_state_id: @state.id).last!
+    return true
+  rescue ActiveRecord::RecordNotFound
+    return false
+  end
+
+  def assign_device(phone_id)
+    Order.transaction do
+      @phone = Phone.where(id: phone_id).last!
+      self.phones << @phone
+
+      @state = EventState.matched_inventory
+      Event.create(
+        event_state_id: @state.id,
+        phone_id: @phone.id,
+        order_id: self.id)
+    end
+    @order
+  end
+
+  def unassign_device(phone_id)
+    @did_unassign = false
+    Order.transaction do
+      @found_phone = self.phones.where(id: phone_id).first
+      if @found_phone
+        self.phones.delete(@found_phone)
+        @state_unassigned = EventState.unassigned_inventory
+        Event.create(
+          event_state_id: @state_unassigned.id,
+          phone_id: @found_phone.id,
+          order_id: self.id)
+        @did_unassign = true
+        break
+      end
+
+      #self.phones.each do |phone|
+      #  if phone.id == phone_id.to_i
+      #  end
+      #end
+
+      # update recorded events
+      # TODO: don't do this
+      #@state = EventState.matched_inventory
+      #@event = Event.where(
+      #  order_id: self.id,
+      #  phone_id: phone_id,
+      #  event_state_id: @state.id).first!
+      #if @event != nil
+      #  @event.destroy
+      #end
+    end
+    @did_unassign
+  end
+
+  # TODO: not optimal!
+  def brute_force_assign_phones
+
+    #TODO: error checking
+    @assigned_ids = nil
+    Order.transaction do
+      # get list of available phones, assign all open slots
+      @phones = Phone.available_inventory(self.arrival_date, self.departure_date)
+      @phones_idx = 0
+      #puts "AVAILABLE: #{@phones.ids.inspect}"
+      if @phones.empty?
+        logger.error "No phones available!"
+        raise "No phones available"
+      end
+      @assigned_ids = Array.new(self.num_phones)
+      (0..self.num_phones-1).each do |i|
+        if !self.phones[i]
+          #puts "\t ASSIGNING #{@phones[@phones_idx].id}"
+          @assigned_ids.push(@phones[@phones_idx].id)
+          
+          # log the event in our history
+          @state = EventState.matched_inventory
+          @event = Event.create({
+              event_state_id: @state.id,
+              phone_id: @phones[@phones_idx].id,
+              order_id: self.id
+            })
+
+          @phones_idx += 1
+        end
+      end
+      self.phone_ids = @assigned_ids
+    end
+    @assigned_ids
+  end
+
+  def phones_still_out
+    @in_date_bracket = (Time.now.utc + 1.day).midnight
+    @state_inventory_received = EventState.received_inventory
+    @received_phone_ids = Event.filter_phone_events(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
+    # subtract phones that have already been checked back in
+    @incoming_phones = Array.new(self.phones.all)
+    @incoming_phones.delete_if { |phone| @received_phone_ids.include? phone.id }
+    @incoming_phones
+  end
+
+  def extend(new_departure_date)
+    if new_departure_date.kind_of?(Date)
+      new_departure_date = new_departure_date.strftime("%Y-%m-%d")
+    end
+    
+    @old_departure_date = self.departure_date
+    self.update(departure_date: new_departure_date)
+
+    @my_phones = self.phones
+
+    # find out which orders could be in conflict
+    #puts "\nORDER IS NOW #{self.arrival_date} #{self.departure_date}"
+    @orders = Order.between(@old_departure_date, new_departure_date)
+    @orders.each do |order|
+      # skip ourselves
+      if order.id == self.id
+        next
+      end
+
+      #puts "CONFLICTING ORDER IS #{order.arrival_date} #{order.departure_date}"
+      @my_phones.each do |conflicting_phone|
+        #puts "\nUNASSIGNING order[#{order.id}] #{conflicting_phone.id}"
+        if order.unassign_device(conflicting_phone.id)
+          #puts "\nNOW REASSIGN!"
+          order.brute_force_assign_phones
+        end
+      end
+    end
+
   end
 
 end

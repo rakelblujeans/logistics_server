@@ -2,7 +2,7 @@
 
 # Test upcoming orders
 upcoming_order:
-  invoice_id: 456XYZ
+  invoice_id: UPCOMING1
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -19,7 +19,7 @@ upcoming_order:
   active: true
 
 current_order:
-  invoice_id: XYZ123
+  invoice_id: CURRENT1
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -35,8 +35,25 @@ current_order:
   num_phones: 2
   active: true
 
+current_order2:
+  invoice_id: CURRENT2
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today + 2 %>
+  departure_date: <%= Date.today + 7 %>
+  language: MyText
+  num_phones: 3
+  active: true
+
 not_current_order_1:
-  invoice_id: XYZ123
+  invoice_id: NOT_CURRENT1
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -53,7 +70,7 @@ not_current_order_1:
   active: true
 
 not_current_order_2:
-  invoice_id: XYZ123
+  invoice_id: NOT_CURRENT2
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -64,13 +81,13 @@ not_current_order_2:
   shipping_apt_suite: MyText
   shipping_notes: MyText
   arrival_date: <%= Date.today - 7 %>
-  departure_date: <%= Date.today - 3 %>
+  departure_date: <%= Date.today - 4 %>
   language: MyText
   num_phones: 3
   active: true
 
 incoming_today:
-  invoice_id: XYZ123
+  invoice_id: INCOMING_TODAY
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -87,7 +104,7 @@ incoming_today:
   active: true
 
 not_incoming_today:
-  invoice_id: XYZ123
+  invoice_id: NOT_INCOMING
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -104,7 +121,7 @@ not_incoming_today:
   active: true
 
 outbound_today:
-  invoice_id: XYZ123
+  invoice_id: OUTBOUND_TODAY
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -117,11 +134,11 @@ outbound_today:
   arrival_date: <%= Date.today + 3 %>
   departure_date: <%= Date.today + 7 %>
   language: MyText
-  num_phones: 3
+  num_phones: 2
   active: true
 
 not_outbound_today:
-  invoice_id: XYZ123
+  invoice_id: NOT_OUTBOUND_TODAY
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -137,8 +154,42 @@ not_outbound_today:
   num_phones: 3
   active: true
 
+past1:
+  invoice_id: PAST1
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today - 10 %>
+  departure_date: <%= Date.today - 4 %>
+  language: MyText
+  num_phones: 2
+  active: true
+
+past2:
+  invoice_id: PAST2_OLDER
+  delivery_type_str: MyText
+  full_address: MyText
+  shipping_name: MyText
+  shipping_city: MyText
+  shipping_state: MyText
+  shipping_zip: MyText
+  shipping_country: MyText
+  shipping_apt_suite: MyText
+  shipping_notes: MyText
+  arrival_date: <%= Date.today - 20 %>
+  departure_date: <%= Date.today - 15 %>
+  language: MyText
+  num_phones: 2
+  active: true
+
 generic:
-  invoice_id: XYZ123
+  invoice_id: GENERIC
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText

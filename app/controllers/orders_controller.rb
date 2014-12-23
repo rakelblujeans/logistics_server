@@ -131,6 +131,17 @@ class OrdersController < ApplicationController
     @data = Order.incoming_on(params[:date])
   end
 
+  # GET /orders/currently_out.json
+  def currently_out
+    @orders = Order.currently_out
+    render 'index'
+  end
+
+  # POST /orders/mark_complete.json
+  def mark_complete
+    @order = Order.mark_complete(params[:invoice_id])
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_order

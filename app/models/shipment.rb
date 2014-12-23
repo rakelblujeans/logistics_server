@@ -32,14 +32,16 @@ class Shipment < ActiveRecord::Base
 		    @shipment.phone_ids = @phones.map(&:id)
 		    #logger.debug "***** #{@shipment.phones.inspect}"
 		    @shipment.save
-		    @estate_delivered = EventState.inventoryDelivered
+		    @estate_delivered = EventState.inventory_delivered
 		    # TODO: pick one and move forward. don't do both
-		    Event.create(
-		      event_state: @estate_delivered,
-		      order_id: @order.id )
+		    #Event.create(
+		    #  event_state: @estate_delivered,
+		    #  order_id: @order.id )
+				# TODO: add a order shipment started event?
 		    @phones.each do |phone|
 		    	Event.create(
 		      event_state: @estate_delivered,
+		      order_id: @order.id,
 		      phone_id: phone.id )
 		    end
 		  end

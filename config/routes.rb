@@ -20,8 +20,10 @@ Rails.application.routes.draw do
   post 'orders/assign_device'     => 'orders#assign_device'
   post 'orders/unassign_device'   => 'orders#unassign_device'
   post 'orders/mark_verified'     => 'orders#mark_verified'
-  get 'orders/incoming_on'         => 'orders#incoming_on'
-  get 'orders/outbound_on'         => 'orders#outbound_on'
+  get 'orders/incoming_on'        => 'orders#incoming_on'
+  get 'orders/outbound_on'        => 'orders#outbound_on'
+  get 'orders/currently_out'         => 'orders#currently_out'
+  post 'orders/mark_complete'     => 'orders#mark_complete'
   resources :orders
 
   #get 'phones/inventory_snapshot/:order_id'  => 'phones#inventory_snapshot'

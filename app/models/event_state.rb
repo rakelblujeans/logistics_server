@@ -1,23 +1,27 @@
 class EventState < ActiveRecord::Base
   has_many :events 
 
-  def self.inventoryAdded
+  def self.inventory_added
   	return _get_or_create_state("inventory added")
   end
 
-	def self.orderReceived
+	def self.order_received
   	return _get_or_create_state("order received")
 	end
 
-  def self.matchedInventory
+  def self.matched_inventory
   	return _get_or_create_state("order matched with inventory")
 	end
 
-	def self.orderVerified # marks it ready for delivery
+	def self.unassigned_inventory
+  	return _get_or_create_state("order unmatched with inventory")
+	end
+
+	def self.order_verified # marks it ready for delivery
   	return _get_or_create_state("order assignment verified")
 	end
 
-	def self.inventoryDelivered
+	def self.inventory_delivered
 		return _get_or_create_state("out for delivery")
 	end
 
@@ -30,8 +34,16 @@ class EventState < ActiveRecord::Base
 #		return _get_or_create_state("sent out by customer")
 #	end
 
-	def self.receivedInventory
+	def self.received_inventory
 		return _get_or_create_state("inventory received by office")
+	end
+
+	def self.order_completed
+		return _get_or_create_state("order completed")
+	end
+
+	def self.deactivated
+		return _get_or_create_state("deactivated")
 	end
 
   private

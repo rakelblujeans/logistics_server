@@ -62,19 +62,6 @@ class PhonesControllerTest < ActionController::TestCase
     # TODO could expand with more tests here
   end
 
-  test "should show incoming orders" do
-    get :incoming_on, :format => :json, id: @phone, date: Date.today
-    assert_response :success
-    assert assigns(:phones), []
-    # TODO could expand with more tests here
-  end
-
-  test "should show outbound orders" do
-    get :outbound_on, :format => :json, id: @phone, date: Date.today
-    assert_response :success
-    assert assigns(:phones), []
-    # TODO could expand with more tests here
-  end
 
   test "should check in a phone" do
     post :check_in, :format => :json, inventory_ids: [@phone.inventory_id]

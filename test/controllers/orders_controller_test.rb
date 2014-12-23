@@ -90,4 +90,22 @@ class OrdersControllerTest < ActionController::TestCase
     assert_not_nil assigns(:order)
   end
 
+  test "should show incoming orders" do
+    get :incoming_on, :format => :json, id: @phone1, date: Date.today
+    assert_response :success
+    assert assigns(:data), []
+    # TODO could expand with more tests here
+  end
+
+  test "should show outbound orders" do
+    get :outbound_on, :format => :json, id: @phone1, date: Date.today
+    assert_response :success
+    assert assigns(:data), []
+    # TODO could expand with more tests here
+  end
+
+  test "mark order complete" do
+    # TODO
+  end
+
 end

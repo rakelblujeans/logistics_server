@@ -5,14 +5,19 @@ class Event < ActiveRecord::Base
   belongs_to :event_state
 
   # return one record per phone
-  def self.filterByState(state, max_date)
-    @ids = []
+  def self.filter_phone_events(state, max_date)
     @events = Event.group(:phone_id)
-    .where("events.created_at <= DATE(?)", max_date)
+    .where("created_at <= DATE(?)", max_date)
     .where(event_state_id: state.id)
-    .having("max(events.created_at)")
+    .having("max(created_at)")
+    @events
   end
 
+  def self.filter_order_events(state, departure_date)
+    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    .where("departure_date = DATE(?)", departure_date)
+    @events
+  end
 =begin
   def self.lastEventForPhone(phone_id, max_date)
     @event = Event.group(:phone_id)

@@ -23,9 +23,7 @@
 	{ description: 'received by customer' },
 	{ description: 'sent out by customer' },
 	{ description: 'inventory received by office' },
-	{ description: 'lost or stolen' },
-	{ description: 'removed from inventory' },
-	{ description: 'temporarily disabled' },
+	{ description: 'deactivated' },
 	]);
 
 @dt1 = DeliveryType.create({name: 'Fedex'});

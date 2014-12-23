@@ -29,3 +29,13 @@ outbound_today:
   out_on_date: <%= Date.today %>
   order_id:
   delivery_type:
+
+generic:
+  delivery_out_code: 456
+  hand_delivered_by: Raquel2
+  delivery_return_code: 789
+  qty: 1
+  active: 1
+  out_on_date: <%= Date.today %>
+  order_id:
+  delivery_type:

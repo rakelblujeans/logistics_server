@@ -1,7 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 generic:
-  inventory_id: 1
+  inventory_id: 5
   MEID: MyText
   ICCID: MyText
   phone_num: MyText
@@ -21,7 +21,7 @@ one:
   provider_id:
 
 two:
-  inventory_id: 1
+  inventory_id: 2
   MEID: MyText
   ICCID: MyText
   phone_num: MyText
@@ -31,7 +31,17 @@ two:
   provider_id:
 
 three:
-  inventory_id: 1
+  inventory_id: 3
+  MEID: MyText
+  ICCID: MyText
+  phone_num: MyText
+  notes: MyText
+  last_imaged: 2014-11-03
+  active: true
+  provider_id:
+
+four:
+  inventory_id: 4
   MEID: MyText
   ICCID: MyText
   phone_num: MyText
