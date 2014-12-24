@@ -33,5 +33,11 @@ module LogisticsServer
       end
     end
 
+    # time the phone spends traveling between customer and our office
+    # we assume it takes the same amount of time in both directions
+    config.delivery_transit_time_sending = 3
+    config.delivery_transit_time_return = 3
+    # warn about orders with missing phones within this many days out from now
+    config.missing_phones_window = 90
   end
 end

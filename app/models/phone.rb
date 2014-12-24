@@ -97,28 +97,32 @@ class Phone < ActiveRecord::Base
   end
 
   def past_orders
-    @past_orders = self.orders.where("date(departure_date, '+3 days') < DATE(?)", Date.today)
+    @past_orders = self.orders.where("date(departure_date, '+? days') < DATE(?)", 
+      Rails.configuration.delivery_transit_time_return, Date.today)
     @past_orders
   end
 
   def last_order
     @last_order = self.orders
-      .where("date(departure_date, '+3 days') < DATE(?)", Date.today)
+      .where("date(departure_date, '+? days') < DATE(?)", 
+        Rails.configuration.delivery_transit_time_return, Date.today)
       .order(created_at: :desc)
       .first
     @last_order
   end
 
   def upcoming_orders
-    @upcoming_orders = self.orders.where("date(arrival_date, '-3 days') >= DATE(?)", Date.today)
+    @upcoming_orders = self.orders.where("date(arrival_date, '-? days') >= DATE(?)", 
+      Rails.configuration.delivery_transit_time_sending, Date.today)
     @upcoming_orders
   end
 
   def current_order
     @today = Date.today
     @order = self.orders.where(
-      "date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') > DATE(?)", 
-      @today, @today).first!
+      "date(arrival_date, '-? days') <= DATE(?) AND date(departure_date, '+? days') > DATE(?)", 
+      Rails.configuration.delivery_transit_time_sending, @today, 
+      Rails.configuration.delivery_transit_time_return, @today).first!
     @order
   rescue ActiveRecord::RecordNotFound
     return nil

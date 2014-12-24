@@ -4,7 +4,7 @@ class PhoneTest < ActiveSupport::TestCase
 
   test "available inventory is listed" do
 		@arrival_date = Date.today
-		@departure_date = Date.today + 3
+		@departure_date = Date.today + Rails.configuration.delivery_transit_time_return
 
   	@phones = Phone.available_inventory(@arrival_date, @departure_date)
   	assert_equal @phones.length, Phone.all.length
@@ -12,7 +12,7 @@ class PhoneTest < ActiveSupport::TestCase
 
   test "if no inventory available none is listed" do
     @arrival_date = Date.today
-    @departure_date = Date.today + 3
+    @departure_date = Date.today + Rails.configuration.delivery_transit_time_return
     Phone.destroy_all
     @phones = Phone.available_inventory(@arrival_date, @departure_date)
     assert_equal 0, Phone.all.length

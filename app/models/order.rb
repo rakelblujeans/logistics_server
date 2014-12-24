@@ -18,8 +18,7 @@ class Order < ActiveRecord::Base
       in_date.gsub! "/", "-"
       in_date = Date.strptime(in_date, "%Y-%m-%d")
     end
-    @return_transit_time = 3
-    @departure_date = in_date - @return_transit_time
+    @departure_date = in_date - Rails.configuration.delivery_transit_time_return
 
     # convert back to string
     @departure_date = @departure_date.strftime("%Y-%m-%d")
@@ -34,8 +33,7 @@ class Order < ActiveRecord::Base
 
     # [date customer needs phone] - [time spent in transit] 
     # = estimated departure date from our office
-    @leading_transit_time = 3
-    @real_date = in_date + @leading_transit_time
+    @real_date = in_date + Rails.configuration.delivery_transit_time_sending
 
     # convert back to string
     @real_date.change({ hour: 0, min: 0, sec: 0 })
@@ -62,6 +60,10 @@ class Order < ActiveRecord::Base
         end
         @order = Order.new(order_params)
         @order.save
+
+        # TODO: create customer
+        # TODO: create receipt
+        # TODO: create credit card
 
         @state = EventState.order_received
         @event = Event.create(
@@ -109,7 +111,7 @@ class Order < ActiveRecord::Base
   # gets list of all unverified orders
   def self.verified
     @state_verified = EventState.order_verified
-    
+
     @ids = []
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
@@ -212,7 +214,9 @@ class Order < ActiveRecord::Base
   def self.overdue_shipping
     @events = Event.joins(:order).group(:order_id)
     .having("max(events.created_at)")
-    .where("date(arrival_date, '-3 days') < DATE(?)", Date.today)
+    .where("date(arrival_date, '-? days') < DATE(?)", 
+      Rails.configuration.delivery_transit_time_sending,
+      Date.today)
 
     @ids = []
     @state_order_verified = EventState.order_verified
@@ -228,7 +232,9 @@ class Order < ActiveRecord::Base
   def self.overdue
     @events = Event.joins(:order).group(:order_id)
     .having("max(events.created_at)")
-    .where("date(departure_date, '+3 days') < DATE(?)", Date.today)
+    .where("date(departure_date, '+? days') < DATE(?)", 
+      Rails.configuration.delivery_transit_time_return,
+      Date.today)
     
     @ids = []
     @state_inventory_sent = EventState.inventory_delivered
@@ -242,12 +248,12 @@ class Order < ActiveRecord::Base
     @orders = @orders.where(id:@ids)
   end
 
-  # warn about missing phones on orders in the next 3 months.
+  # warn about missing phones on orders in the next X months.
   # (that should be long enough to give us adequate time to react)
   def self.missing_phones
     @missing = []
     @active_orders = Order.where(active: true)
-    @orders = @active_orders.between(Date.today, Date.today + 90)
+    @orders = @active_orders.between(Date.today, Date.today + Rails.configuration.missing_phones_window)
     @orders.each do |order|
       if order.phones.length != order.num_phones
         @missing << order
@@ -265,8 +271,11 @@ class Order < ActiveRecord::Base
 
     # orders currently out
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
-    .where("date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') >= DATE(?)", 
-      @today, @today)
+    .where("date(arrival_date, '-? days') <= DATE(?) AND date(departure_date, '+? days') >= DATE(?)", 
+      Rails.configuration.delivery_transit_time_sending,
+      @today, 
+      Rails.configuration.delivery_transit_time_return,
+      @today)
     @ids2 = []
     @events.each do |event|
       if event.event_state_id == @state_inventory_sent.id
@@ -290,8 +299,11 @@ class Order < ActiveRecord::Base
       date2 = date2.strftime("%Y-%m-%d")
     end
 
-    @orders = Order.where("(DATE(?) <= date(arrival_date, '-3 days') AND date(arrival_date, '-3 days') < DATE(?)) OR (DATE(?) <= date(departure_date, '+3 days') AND date(departure_date, '+3 days') < DATE(?))",
-      date1, date2, date1, date2)
+    @orders = Order.where("(DATE(?) <= date(arrival_date, '-? days') AND date(arrival_date, '-? days') < DATE(?)) OR (DATE(?) <= date(departure_date, '+? days') AND date(departure_date, '+? days') < DATE(?))",
+      date1, Rails.configuration.delivery_transit_time_sending,
+      Rails.configuration.delivery_transit_time_sending, date2, 
+      date1, Rails.configuration.delivery_transit_time_return,
+      Rails.configuration.delivery_transit_time_return, date2)
   end
 
 #########
@@ -380,7 +392,9 @@ class Order < ActiveRecord::Base
     @assigned_ids = nil
     Order.transaction do
       # get list of available phones, assign all open slots
-      @phones = Phone.available_inventory(self.arrival_date-3, self.departure_date+3)
+      @phones = Phone.available_inventory(
+        self.arrival_date - Rails.configuration.delivery_transit_time_sending, 
+        self.departure_date + Rails.configuration.delivery_transit_time_return)
       @phones_idx = 0
       #puts "\n\n **** AVAILABLE[#{self.invoice_id}]: #{@phones.ids.inspect}"
       if @phones.empty?
