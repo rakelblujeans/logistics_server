@@ -96,14 +96,16 @@ class Phone < ActiveRecord::Base
       @event_params = {
         event_state_id: @estate.id,
         phone_id: phone.id}
-      #if phone.current_order
-      #  @event_params[:order_id] = phone.current_order.id
-      #end
       @event = Event.create(@event_params)
+
+      # if all phones for this order have been checked in
+      # mark order complete
+      if phone.last_order && 
+        phone.last_order.phones_still_out.length == 0
+        phone.last_order.mark_complete
+      end
     end
 
-    # if all phones for this order have been checked in, mark order complete
-    # TODO?
     @phones
   end
 
@@ -116,7 +118,7 @@ class Phone < ActiveRecord::Base
     @last_order = self.orders
       .where("date(departure_date, '+3 days') < DATE(?)", Date.today)
       .order(created_at: :desc)
-      .first!
+      .first
     @last_order
   end
 

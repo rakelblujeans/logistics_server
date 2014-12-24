@@ -193,18 +193,7 @@ class Order < ActiveRecord::Base
 
   def self.mark_complete(invoice_id)
     @order = Order.where(invoice_id: invoice_id).last!
-    @phones_copy = Array.new(@order.phones_still_out)
-    
-    @phones_copy.each do |phone|
-      Phone.check_in(phone.inventory_id)
-    end
-
-    @state_completed = EventState.order_completed
-    Event.create({
-      event_state_id: @state_completed.id,
-      order_id: @order.id
-      })
-    @order
+    @order.mark_complete
   end
 
   def self.warnings
@@ -298,6 +287,19 @@ class Order < ActiveRecord::Base
   end
 
 #########
+  def mark_complete
+    @phones_copy = Array.new(self.phones_still_out)
+    @phones_copy.each do |phone|
+      Phone.check_in(phone.inventory_id)
+    end
+
+    @state_completed = EventState.order_completed
+    Event.create({
+      event_state_id: @state_completed.id,
+      order_id: self.id
+      })
+    self
+  end
 
   def mark_verified
     @state = EventState.order_verified

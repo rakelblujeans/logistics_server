@@ -100,6 +100,18 @@ class PhoneTest < ActiveSupport::TestCase
   	assert_not_nil @phone
 	end
 
+  test "when all phones received, order is marked complete" do
+    @order = create_order(orders(:upcoming_order))
+    @order.brute_force_assign_phones
+    @phone = Phone.check_in([@order.phones[0]])
+    
+    @state_complete = EventState.order_completed
+    @event = Event.where(
+      event_state_id: @state_complete.id,
+      order_id: @order.id)
+    assert_not_nil @event
+  end
+
   test "deactivating phone correctly reassigns upcoming orders" do
     @phone1 = create_phone(phones(:one))
     @phone2 = create_phone(phones(:two))
