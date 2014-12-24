@@ -120,7 +120,7 @@ class OrderTest < ActiveSupport::TestCase
 
   test "outbound order today is false" do
     @phone = create_phone(phones(:generic))
-    @order = create_order(orders(:not_outbound_today))
+    @order = create_order(orders(:outbound_yesterday))
     @phone.orders << @order
     @order.mark_verified
 
@@ -185,10 +185,10 @@ class OrderTest < ActiveSupport::TestCase
     @orders = Order.currently_out
     assert @orders.any?{|order| order.invoice_id == "CURRENT1"} == true
     assert @orders.any?{|order| order.invoice_id == "CURRENT2"} == true
-    assert @orders.any?{|order| order.invoice_id == "NOT_CURRENT1"} == false
-    assert @orders.any?{|order| order.invoice_id == "NOT_CURRENT2"} == false
+    assert @orders.any?{|order| order.invoice_id == "NOT_CURRENT1"} == false # future
+    assert @orders.any?{|order| order.invoice_id == "NOT_CURRENT2"} == true # overdue
     assert @orders.any?{|order| order.invoice_id == "UPCOMING1"} == false
-    assert @orders.any?{|order| order.invoice_id == "INCOMING_TODAY"} == false
+    assert @orders.any?{|order| order.invoice_id == "INCOMING_TODAY"} == true # not checked in yet
     assert @orders.any?{|order| order.invoice_id == "OUTBOUND_TODAY"} == true
   end
 
@@ -208,6 +208,8 @@ class OrderTest < ActiveSupport::TestCase
     assert @orders.any?{|order| order.invoice_id == "CURRENT2"} == false
   end
 
+  # TODO: add test to check that received (individually) phones don't still display as incoming
+  
   test "orders which are marked received no longer show as out" do
     @order = create_order(orders(:current_order))
 
@@ -284,8 +286,6 @@ class OrderTest < ActiveSupport::TestCase
     @order2 = create_order(orders(:outbound_today)) # 2 phones
     @order2.brute_force_assign_phones
 
-
-    
     @events = Event.joins(:order).group(:phone_id)
     .where("departure_date >= DATE(?) AND departure_date < DATE(?)", @order1.arrival_date, @order1.departure_date + 3)
     .having("max(events.created_at)")
@@ -341,7 +341,46 @@ class OrderTest < ActiveSupport::TestCase
     assert_equal "No phones available", @exception.message
   end
 
-  # TODO: add test to check that received phones don't still display as incoming
-  # TODO: overdue
+  test "overdue orders detected" do
+    @phone2 = create_phone(phones(:one))
+    @phone1 = create_phone(phones(:two))
+    @phone3 = create_phone(phones(:three))
+
+    # on time
+    @order1 = create_order(orders(:incoming_today))
+    @order1.brute_force_assign_phones
+    @order1.mark_verified
+    @ship = create_shipment(shipments(:incoming_today), @order1, @phone)
+    @order1.shipments << @ship
+
+    # past due
+    @order2 = create_order(orders(:past1))
+    @order2.brute_force_assign_phones
+    @order2.mark_verified
+    @ship = create_shipment(shipments(:generic), @order2, @phone)
+    @order2.shipments << @ship
+
+    @overdue_orders = Order.overdue
+    assert_equal 1, @overdue_orders.length
+    assert_equal @order2.invoice_id, @overdue_orders[0].invoice_id
+  end
+
+  test "overdue shipping detected" do
+    @phone2 = create_phone(phones(:one))
+    @phone1 = create_phone(phones(:two))
+    @phone3 = create_phone(phones(:three))
+
+    @order1 = create_order(orders(:outbound_yesterday))
+    @order1.brute_force_assign_phones
+    @order1.mark_verified
+
+    @order2 = create_order(orders(:outbound_today))
+    @order2.brute_force_assign_phones
+    @order2.mark_verified
+
+    @overdue_orders = Order.overdue_shipping
+    assert_equal 1, @overdue_orders.length
+    assert_equal @order1.invoice_id, @overdue_orders[0].invoice_id
+  end
 
 end

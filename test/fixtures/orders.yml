@@ -137,8 +137,8 @@ outbound_today:
   num_phones: 2
   active: true
 
-not_outbound_today:
-  invoice_id: NOT_OUTBOUND_TODAY
+outbound_yesterday:
+  invoice_id: OUTBOUND_YESTERDAY
   delivery_type_str: MyText
   full_address: MyText
   shipping_name: MyText
@@ -151,7 +151,7 @@ not_outbound_today:
   arrival_date: <%= Date.today + 2 %>
   departure_date: <%= Date.today + 7 %>
   language: MyText
-  num_phones: 3
+  num_phones: 2
   active: true
 
 past1:

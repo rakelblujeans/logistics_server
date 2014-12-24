@@ -207,19 +207,36 @@ class Order < ActiveRecord::Base
     @order
   end
 
-  def self.overdue
+  def self.overdue_shipping
     @events = Event.joins(:order).group(:order_id)
     .having("max(events.created_at)")
-    .where("date(departure_date, '+3 days') <= DATE(?)", Date.today)
+    .where("date(arrival_date, '-3 days') < DATE(?)", Date.today)
 
-    @order_ids = []
+    @ids = []
+    @state_order_verified = EventState.order_verified
     @events.each do |event|
-      if event.event_state_id == @state_inventory_sent.id
-        @order_ids << event.order_id
+      if event.event_state_id == @state_order_verified.id
+        @ids << event.order_id
       end
     end
 
-    @orders = Order.where(id:@order_ids)
+    @orders = Order.where(id:@ids)
+  end
+
+  def self.overdue
+    @events = Event.joins(:order).group(:order_id)
+    .having("max(events.created_at)")
+    .where("date(departure_date, '+3 days') < DATE(?)", Date.today)
+    
+    @ids = []
+    @state_inventory_sent = EventState.inventory_delivered
+    @events.each do |event|
+      if event.event_state_id == @state_inventory_sent.id
+        @ids << event.order_id
+      end
+    end
+
+    @orders = Order.where(id:@ids)
   end
 
   def self.currently_out
@@ -228,23 +245,23 @@ class Order < ActiveRecord::Base
     # delivered some inventory. Not optimal!
     @today = Date.today
     @state_inventory_sent = EventState.inventory_delivered
-    @order_ids = []
+    
 
     # orders currently out
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
-    .where("date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') > DATE(?)", 
+    .where("date(arrival_date, '-3 days') <= DATE(?) AND date(departure_date, '+3 days') >= DATE(?)", 
       @today, @today)
-    
+    @ids2 = []
     @events.each do |event|
       if event.event_state_id == @state_inventory_sent.id
-        @order_ids << event.order_id
+        @ids2 << event.order_id
       end
     end
   
     # orders overdue
-    @order_ids << Order.overdue.pluck(:id)
-
-    @orders = Order.where(id:@order_ids)
+    @ids2.concat Order.overdue.pluck(:id)
+    # combine and return complete list
+    @orders = Order.where(id:@ids2)
   end
 
   # gets ALL orders between these two dates, regardless of state
