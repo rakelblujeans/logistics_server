@@ -87,24 +87,29 @@ class Order < ActiveRecord::Base
   # gets list of all unverified orders
   def self.unverified
     @state_received = EventState.order_received
+    @state_unverified = EventState.order_unverified
     @state_matched = EventState.matched_inventory
     @state_unmatched = EventState.unassigned_inventory
+    
     @ids = []
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
       if event.event_state_id == @state_received.id || 
+        event.event_state_id == @state_unverified.id ||
         event.event_state_id == @state_matched.id ||
         event.event_state_id == @state_unmatched.id
         @ids << event.order_id
       end
     end
 
-    @orders = Order.find(@ids)
+    @active_orders = Order.where(active: true)
+    @orders = @active_orders.find(@ids)
   end
 
   # gets list of all unverified orders
   def self.verified
     @state_verified = EventState.order_verified
+    
     @ids = []
     @events = Event.group(:order_id).having("max(events.created_at)")
     @events.each do |event|
@@ -113,7 +118,8 @@ class Order < ActiveRecord::Base
       end
     end
 
-    @orders = Order.find(@ids)
+    @active_orders = Order.where(active: true)
+    @orders = @active_orders.find(@ids)
   end
 
   # what phones arrive in our office on this date?
@@ -232,14 +238,16 @@ class Order < ActiveRecord::Base
       end
     end
 
-    @orders = Order.where(id:@ids)
+    @orders = Order.where(active: true)
+    @orders = @orders.where(id:@ids)
   end
 
   # warn about missing phones on orders in the next 3 months.
   # (that should be long enough to give us adequate time to react)
   def self.missing_phones
     @missing = []
-    @orders = Order.between(Date.today, Date.today + 90)
+    @active_orders = Order.where(active: true)
+    @orders = @active_orders.between(Date.today, Date.today + 90)
     @orders.each do |order|
       if order.phones.length != order.num_phones
         @missing << order
@@ -301,11 +309,18 @@ class Order < ActiveRecord::Base
     self
   end
 
-  def mark_verified
-    @state = EventState.order_verified
-    @event = Event.create(
-      order_id: self.id,
-      event_state_id: @state.id)
+  def mark_verified(is_verified = true)
+    if is_verified
+      @state = EventState.order_verified
+      @event = Event.create(
+        order_id: self.id,
+        event_state_id: @state.id)
+    else
+      @state = EventState.order_unverified
+      @event = Event.create(
+        order_id: self.id,
+        event_state_id: @state.id)
+    end
   end
 
   def is_verified
@@ -353,7 +368,6 @@ class Order < ActiveRecord::Base
   # TODO: not optimal!
   # TODO: error checking
   def brute_force_assign_phones
-
     # if we have assigned more phones than this order needs, 
     # correct for that here
     if self.phones.length > self.num_phones

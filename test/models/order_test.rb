@@ -14,9 +14,24 @@ class OrderTest < ActiveSupport::TestCase
 
   test "mark order verified" do
   	@order = create_order(orders(:generic))
+    assert_equal 1, Order.unverified.length
+    assert_equal 0, Order.verified.length
+
   	@order.mark_verified
+
   	assert_equal 0, Order.unverified.length
   	assert_equal 1, Order.verified.length
+  end
+
+  test "mark order unverified" do
+    @order = create_order(orders(:generic))
+    @order.mark_verified(true)
+    assert_equal 0, Order.unverified.length
+    assert_equal 1, Order.verified.length
+
+    @order.mark_verified(false)
+    assert_equal 1, Order.unverified.length
+    assert_equal 0, Order.verified.length
   end
 
   test "is_verified marks verified orders as true" do
@@ -438,5 +453,4 @@ class OrderTest < ActiveSupport::TestCase
 
   # TODO: re-activating an order assigns phones
   # TODO: update_data
-
 end

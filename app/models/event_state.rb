@@ -21,6 +21,10 @@ class EventState < ActiveRecord::Base
   	return _get_or_create_state("order assignment verified")
 	end
 
+	def self.order_unverified # marks it ready for delivery
+  	return _get_or_create_state("order assignment unverified")
+	end
+
 	def self.inventory_delivered
 		return _get_or_create_state("out for delivery")
 	end

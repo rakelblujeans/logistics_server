@@ -56,7 +56,7 @@ class OrdersController < ApplicationController
 
   # POST /orders/mark_verified.json
   def mark_verified
-    @order.mark_verified
+    @order.mark_verified(params[:is_verified])
     @order    
   rescue ActiveRecord::RecordNotFound
     # TODO
