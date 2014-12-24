@@ -35,13 +35,7 @@ class OrdersController < ApplicationController
 
   # PATCH/PUT /orders/1.json
   def update
-    # has to happen before general object update below
-    @old_departure_date = @order.departure_date
-    if order_params[:departure_date] &&
-        @old_departure_date != order_params[:departure_date]
-        @order.extend order_params[:departure_date]
-      end
-    if @order.update(order_params)
+    if @order.update_data(order_params)
       respond_with @order, :status => :ok, :location => @order
     else 
       respond_with @order, :status => :unprocessable_entity
@@ -133,6 +127,22 @@ class OrdersController < ApplicationController
 
   def warnings
   #  [@overdue, @shipping, @missing_phones] = Order.warnings
+  end
+
+  # POST /orders/1/toggle_activation.json
+  def toggle_activation
+    @order = Order.find(params[:id])
+    if @order
+      if @order.active
+        @order.cancel
+      else
+        @order.update_data({active: true})
+      end
+
+      respond_with @order, :status => :ok, :location => @order
+    else
+      respond_with @order, :status => :unprocessable_entity
+    end
   end
 
   private

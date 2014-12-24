@@ -414,4 +414,29 @@ class OrderTest < ActiveSupport::TestCase
 
   # TODO: all warning together
 
+  test "canceling an order works" do
+    @phone1 = create_phone(phones(:generic))
+    @phone2 = create_phone(phones(:generic))
+    @phone3 = create_phone(phones(:generic))
+    @order = create_order(orders(:generic))
+    @order.brute_force_assign_phones
+    
+    assert_equal @order.num_phones, @order.phones.length
+    
+    @order.cancel
+    
+    assert_equal 0, @order.phones.length
+    assert_equal false, @order.active
+    @state_canceled = EventState.deactivated
+    @event = Event.where(order_id: @order.id,
+      event_state_id: @state_canceled.id)
+    assert_not_nil @event
+  end
+
+  # TODO: brute_force handles case when num_phones decreases
+  # TODO: brute_force handles case when num_phones increases
+
+  # TODO: re-activating an order assigns phones
+  # TODO: update_data
+
 end

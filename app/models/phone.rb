@@ -62,22 +62,9 @@ class Phone < ActiveRecord::Base
     # convert date objects into strings
     in_start = in_start.strftime("%Y-%m-%d")
     in_end = in_end.strftime("%Y-%m-%d")
-    
-    #.where("(DATE(?) <= arrival_date AND arrival_date < DATE(?)) OR (DATE(?) <= departure_date AND departure_date < DATE(?))", 
-    #puts "CHECKING BETWEEN #{in_start} #{in_end}"
-    #@events = Event.joins(:order).group(:phone_id)
-    #.where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end)
-    #.having("max(events.updated_at)")
-    @used_phone_ids = Order.joins(:phones).where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end).pluck(:phone_id)
 
-    #puts "\n**FOUND EVENTS** #{@events.inspect}"
-    #@used_phone_ids = []
-    #@state_matched = EventState.matched_inventory
-    #@events.each do |event|
-    #  if event.event_state_id == @state_matched.id
-    #    @used_phone_ids << event.phone_id
-    #  end
-    #end
+    @orders = Order.where(active: true)        
+    @used_phone_ids = @orders.joins(:phones).where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end).pluck(:phone_id)
 
     # return the complement of that set
     #puts "\nCURRENTLY USED PHONES: #{@used_phone_ids.inspect} BETWEEN #{in_start} #{in_end}"
@@ -138,6 +125,11 @@ class Phone < ActiveRecord::Base
   end
 
   def deactivate
+    @state_canceled = EventState.deactivated
+    Event.create(
+      event_state_id: @state_canceled.id,
+      phone_id: self.id)
+
     self.update(active: false);
 
     #logger.debug "\n\n UPCOMING ORDERS\n#{self.upcoming_orders.inspect}"

@@ -351,9 +351,18 @@ class Order < ActiveRecord::Base
   end
 
   # TODO: not optimal!
+  # TODO: error checking
   def brute_force_assign_phones
 
-    # TODO: error checking
+    # if we have assigned more phones than this order needs, 
+    # correct for that here
+    if self.phones.length > self.num_phones
+      @excess = self.phones.length - self.num_phones
+      for i in 0..@excess
+        self.unassign_device(self.phones[0])
+      end
+    end
+
     @assigned_ids = nil
     Order.transaction do
       # get list of available phones, assign all open slots
@@ -427,7 +436,44 @@ class Order < ActiveRecord::Base
         end
       end
     end
+  end
 
+  def cancel
+    @state_canceled = EventState.deactivated
+    Event.create(
+      event_state_id: @state_canceled.id,
+      order_id: self.id)
+
+    self.update(active: false)
+    # clean up, so that if we "reactivate" the order
+    # later on, these slots will be clear
+    @phones_copy = Array.new(self.phones)
+    @phones_copy.each do |phone|
+      self.unassign_device(phone.id)
+    end
+
+    self
+  end
+
+  # use this instead of the built-in update function
+  # in order to keep all data consistent
+  def update_data(order_params)
+    @old_departure_date = self.departure_date
+    if order_params[:departure_date] &&
+      @old_departure_date != order_params[:departure_date]
+        self.extend order_params[:departure_date]
+    end
+    if self.update(order_params)
+      # if re-activating an order or changing # of phones included, 
+      # update phone assignment
+      logger.debug "\n\n**** IS ACTIVE #{self.active}"
+      if self.active
+        self.brute_force_assign_phones
+      end
+      return true
+    else 
+      return false
+    end
   end
 
 end

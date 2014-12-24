@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   get  'orders/overdue_shipping'  => 'orders#overdue_shipping'
   get  'orders/missing_phones'    => 'orders#missing_phones'
   get  'orders/warnings'          => 'orders#warnings'
+  put  'orders/:id/toggle_activation' => 'orders#toggle_activation'
   resources :orders
 
   get  'phones/available_inventory'   => 'phones#available_inventory'
