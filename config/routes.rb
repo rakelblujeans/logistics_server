@@ -26,6 +26,8 @@ Rails.application.routes.draw do
   post 'orders/mark_complete'     => 'orders#mark_complete'
   get  'orders/overdue'           => 'orders#overdue'
   get  'orders/overdue_shipping'  => 'orders#overdue_shipping'
+  get  'orders/missing_phones'    => 'orders#missing_phones'
+  get  'orders/warnings'          => 'orders#warnings'
   resources :orders
 
   get  'phones/available_inventory'   => 'phones#available_inventory'

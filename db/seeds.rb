@@ -95,6 +95,39 @@
 # estimated time spent in transit during delivery
 @lead_time = 3;
 
+# this is a past due order
+@order6 = Order.addNew({
+	invoice_id: 'IUY629',
+	delivery_type_str: 'residential',
+	full_address: '456 Main St',
+	shipping_name: 'Mrs Past Due',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '67890',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: Date.today - 17,
+	departure_date: Date.today - 7,
+	language: 'en',
+	num_phones: 1,
+	#customer: @c1,
+	active: true
+	})
+@order6.brute_force_assign_phones
+@order6.mark_verified
+@shipment6 = Shipment.addNew({
+	active: true,
+	delivery_out_code: "1Z9999999999999999",
+	delivery_return_code: "1Z9999999999999999",
+	out_on_date: @order6.arrival_date - @lead_time,
+	order_id: @order6.id,
+	phone_ids: @order6.phone_ids,
+	qty: @order6.phones.count
+	})
+
+
+
 # this order is returning to our office today
 @order2 = Order.addNew({
 	invoice_id: '456FGH',
@@ -125,6 +158,29 @@
 	phone_ids: @order2.phone_ids,
 	qty: @order2.phones.count
 	})
+
+
+# this should have shipped yesterday
+@order7 = Order.addNew({
+	invoice_id: 'MNB012',
+	delivery_type_str: 'residential',
+	full_address: '93 Cooper Lane',
+	shipping_name: 'Mr Late Shipper',
+	shipping_city: 'new york',
+	shipping_state: 'NY',
+	shipping_zip: '67890',
+	shipping_country: 'USA',
+	shipping_apt_suite: '4C',
+	shipping_notes: 'leave a note on the door',
+	arrival_date: Date.today + 2,
+	departure_date: Date.today + 5,
+	language: 'en',
+	num_phones: 1,
+	#customer: @c1,
+	active: true
+	})
+@order7.brute_force_assign_phones
+@order7.mark_verified
 
 # this order is outbound tomorrow
 @order1 = Order.addNew({
@@ -201,6 +257,7 @@
 	})
 @order5.brute_force_assign_phones
 
+# this one has one phone missing
 @order4 = Order.addNew({
 	invoice_id: '345BUQ',
 	delivery_type_str: 'residential',
@@ -220,7 +277,7 @@
 	active: true
 	})
 @order4.brute_force_assign_phones
-
+@order4.phones.delete(@order4.phones[0])
 
 
 =begin

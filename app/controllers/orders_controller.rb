@@ -35,21 +35,13 @@ class OrdersController < ApplicationController
 
   # PATCH/PUT /orders/1.json
   def update
-=begin
-    respond_to do |format|
-      if @order.update(order_params)
-        
-        @order.brute_force_assign_phones
-
-        format.html { redirect_to @order, notice: 'Order was successfully updated.' }
-        format.json { render :show, status: :ok, location: @order }
-      else
-        format.html { render :edit }
-        format.json { render json: @order.errors, status: :unprocessable_entity }
+    # has to happen before general object update below
+    @old_departure_date = @order.departure_date
+    if order_params[:departure_date] &&
+        @old_departure_date != order_params[:departure_date]
+        @order.extend order_params[:departure_date]
       end
-    end
-=end
-  if @order.update(order_params)
+    if @order.update(order_params)
       respond_with @order, :status => :ok, :location => @order
     else 
       respond_with @order, :status => :unprocessable_entity
@@ -132,6 +124,15 @@ class OrdersController < ApplicationController
   def overdue_shipping
     @orders = Order.overdue_shipping
     render 'index'
+  end
+
+  def missing_phones
+    @orders = Order.missing_phones
+    render 'index'
+  end
+
+  def warnings
+  #  [@overdue, @shipping, @missing_phones] = Order.warnings
   end
 
   private

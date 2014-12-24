@@ -207,6 +207,13 @@ class Order < ActiveRecord::Base
     @order
   end
 
+  def self.warnings
+    @overdue = Order.overdue
+    @shipping = Order.overdue_shipping
+    @missing_phones = Order.missing_phones
+    [@overdue, @shipping, @missing_phones]
+  end
+
   def self.overdue_shipping
     @events = Event.joins(:order).group(:order_id)
     .having("max(events.created_at)")
@@ -239,13 +246,25 @@ class Order < ActiveRecord::Base
     @orders = Order.where(id:@ids)
   end
 
+  # warn about missing phones on orders in the next 3 months.
+  # (that should be long enough to give us adequate time to react)
+  def self.missing_phones
+    @missing = []
+    @orders = Order.between(Date.today, Date.today + 90)
+    @orders.each do |order|
+      if order.phones.length != order.num_phones
+        @missing << order
+      end
+    end
+    @missing
+  end
+
   def self.currently_out
     # NOTE: since we are not tracking Fedex/delivery events, 
     # just go off order's departure date & the fact that we
     # delivered some inventory. Not optimal!
     @today = Date.today
     @state_inventory_sent = EventState.inventory_delivered
-    
 
     # orders currently out
     @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
@@ -325,22 +344,6 @@ class Order < ActiveRecord::Base
         @did_unassign = true
         break
       end
-
-      #self.phones.each do |phone|
-      #  if phone.id == phone_id.to_i
-      #  end
-      #end
-
-      # update recorded events
-      # TODO: don't do this
-      #@state = EventState.matched_inventory
-      #@event = Event.where(
-      #  order_id: self.id,
-      #  phone_id: phone_id,
-      #  event_state_id: @state.id).first!
-      #if @event != nil
-      #  @event.destroy
-      #end
     end
     @did_unassign
   end

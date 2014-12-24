@@ -209,7 +209,7 @@ class OrderTest < ActiveSupport::TestCase
   end
 
   # TODO: add test to check that received (individually) phones don't still display as incoming
-  
+
   test "orders which are marked received no longer show as out" do
     @order = create_order(orders(:current_order))
 
@@ -382,5 +382,36 @@ class OrderTest < ActiveSupport::TestCase
     assert_equal 1, @overdue_orders.length
     assert_equal @order1.invoice_id, @overdue_orders[0].invoice_id
   end
+
+  test "report missing phones due to not enough available phones after re-assignment" do
+    @phone1 = create_phone(phones(:generic))
+    @phone2 = create_phone(phones(:one))
+    # clear all other phones
+    @other_phones = Phone.where.not(id:[@phone1.id, @phone2.id])
+    @other_phones.destroy_all
+
+    @order1 = create_order(orders(:incoming_today)) # 2 phones
+    @order1.brute_force_assign_phones
+    @order2 = create_order(orders(:outbound_today)) # 2 phones
+    @order2.brute_force_assign_phones
+
+    # clear all other orders
+    @other_orders = Order.where.not(id:[
+      @order1.id, 
+      @order2.id])
+    @other_orders.destroy_all
+
+    @order1_phones = @order1.phone_ids
+    @order2_phones = @order2.phone_ids
+    assert_equal @order1_phones, @order2_phones
+
+    @exception = assert_raises(RuntimeError) { @order1.extend(@order2.arrival_date + 1) }
+
+    @missing = Order.missing_phones
+    assert_equal 1, @missing.length
+    assert_equal @order2.invoice_id, @missing[0].invoice_id
+  end
+
+  # TODO: all warning together
 
 end
