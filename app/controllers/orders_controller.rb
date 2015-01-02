@@ -76,7 +76,7 @@ class OrdersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     # TODO: log internally. don't show client facing message.
   ensure
-      render 'show'
+    render 'show'
   end
 
   # DELETE orders/unassign_device.json
@@ -108,6 +108,7 @@ class OrdersController < ApplicationController
   # POST /orders/mark_complete.json
   def mark_complete
     @order = Order.mark_complete(params[:invoice_id])
+    render 'show'
   end
 
   def overdue
@@ -125,9 +126,9 @@ class OrdersController < ApplicationController
     render 'index'
   end
 
-  def warnings
+  #def warnings
   #  [@overdue, @shipping, @missing_phones] = Order.warnings
-  end
+  #end
 
   # POST /orders/1/toggle_activation.json
   def toggle_activation

@@ -105,7 +105,35 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "mark order complete" do
-    # TODO
+    post :mark_complete, :format => :json, invoice_id: @order.invoice_id
+    #assert_response :success
+    assert_not_nil assigns(:order)
+  end
+
+  test "overdue" do
+    get :overdue, :format => :json
+    assert_response :success
+    assert assigns(:orders), []
+  end
+
+  test "overdue_shipping" do
+    get :overdue_shipping, :format => :json
+    assert_response :success
+    assert assigns(:orders), []
+  end
+
+  test "missing_phones" do
+    get :missing_phones, :format => :json
+    assert_response :success
+    assert assigns(:orders), []
+  end
+
+  test "toggle_activation" do
+    assert_equal true, @order.active
+    get :toggle_activation, :format => :json, id: @order.id
+    assert_response :success
+    assert assigns(:order), []
+    assert_equal false, assigns(:order).active
   end
 
 end
