@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :providers
 
   get 'home/index'
+  get 'home/search'
 
   resources :credit_cards
 

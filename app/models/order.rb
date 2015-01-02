@@ -306,6 +306,28 @@ class Order < ActiveRecord::Base
       Rails.configuration.delivery_transit_time_return, date2)
   end
 
+def self.search(query_string)
+  @final_list = []
+  if !query_string
+    return @final_list
+  end
+  
+  @terms = query_string.split(",")
+  @terms.each do |term|
+    term = "%#{term}%"
+    @orders = 
+      Order.where('invoice_id like ? OR full_address like ? OR shipping_name like ? OR shipping_city like ? 
+        OR shipping_state like ? OR shipping_zip like ? OR shipping_country like ? 
+        OR shipping_apt_suite like ? OR shipping_notes like ? OR arrival_date like ?
+        OR departure_date like ? OR language like ?',
+        term, term, term, term, term, term, term, term, term, term, term, term).all
+    @orders
+    @final_list = @final_list + @orders
+  end
+
+  @final_list.uniq
+end
+
 #########
   def mark_complete
     @phones_copy = Array.new(self.phones_still_out)
@@ -494,7 +516,6 @@ class Order < ActiveRecord::Base
     if self.update(order_params)
       # if re-activating an order or changing # of phones included, 
       # update phone assignment
-      logger.debug "\n\n**** IS ACTIVE #{self.active}"
       if self.active
         self.brute_force_assign_phones
       end

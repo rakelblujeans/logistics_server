@@ -96,6 +96,28 @@ class Phone < ActiveRecord::Base
     @phones
   end
 
+  def self.search(query_string)
+    @final_list = []
+    if !query_string
+      return @final_list
+    end
+    
+    @terms = query_string.split(",")
+    @terms.each do |term|
+      term = "%#{term}%"
+      @phones = 
+        Phone.where('inventory_id like ? OR MEID like ? OR ICCID like ? OR 
+          phone_num like ? OR notes like ? OR last_imaged like ?',
+          term, term, term, term, term, term).all
+      @phones
+      @final_list = @final_list + @phones
+    end
+
+    @final_list.uniq
+  end
+
+#############
+
   def past_orders
     @past_orders = self.orders.where("date(departure_date, '+? days') < DATE(?)", 
       Rails.configuration.delivery_transit_time_return, Date.today)
