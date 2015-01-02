@@ -168,15 +168,68 @@ class OrderTest < ActiveSupport::TestCase
     @ship2 = create_shipment(shipments(:generic), @order, @phone2)
     @order.shipments << [@ship1, @ship2]
     
-    
-    Order.mark_complete(@order.invoice_id)
-    assert_equal 0, @order.phones_still_out.length
-
     @state_completed = EventState.order_completed
     @found_event = Event.where(
       order_id: @order.id, 
       event_state_id: @state_completed.id)
-    assert_equal @found_event.length, 1
+    assert_equal 0, @found_event.length
+
+    Order.mark_complete(@order.invoice_id)
+    assert_equal 0, @order.phones_still_out.length
+
+    @found_event = Event.where(
+      order_id: @order.id, 
+      event_state_id: @state_completed.id)
+    assert_equal 1, @found_event.length
+  end
+
+  test "overdue orders recognized" do
+    @order = create_order(orders(:past1))
+    @phone1 = create_phone(phones(:one))
+    @phone2 = create_phone(phones(:two))
+    @phone3 = create_phone(phones(:three))
+    @order.brute_force_assign_phones
+    @order.mark_verified
+    @ship1 = create_shipment(shipments(:generic), @order, @phone1)
+    @order.shipments << [@ship1]
+    
+    assert_equal 1, Order.overdue.length
+  end
+
+  test "orders which should have shipped are recognized" do
+    @order = create_order(orders(:current_order2))
+    @phone1 = create_phone(phones(:one))
+    @phone2 = create_phone(phones(:two))
+    @phone3 = create_phone(phones(:three))
+    @order.brute_force_assign_phones
+    @order.mark_verified
+    
+    assert_equal 1, Order.overdue_shipping.length
+  end
+
+  test "orders with missing phones recognized" do
+    @order = create_order(orders(:current_order2))
+    # clear all other orders
+    @other = Order.where.not(id:[@order.id])
+    @other.destroy_all
+
+    @phone1 = create_phone(phones(:one))
+    @phone2 = create_phone(phones(:two))
+    @phone3 = create_phone(phones(:three))
+    @order.brute_force_assign_phones
+    @order.phones[0].delete
+    
+    assert_equal 1, Order.missing_phones.length
+  end
+
+  test "warnings works" do
+    Order.destroy_all
+    # individual cases tested above, so just test that
+    # return format is correct
+    @result = Order.warnings
+    assert_equal [], @result[0]
+    assert_equal [], @result[1]
+    assert_equal [], @result[2]
   end
 
   test "orders out in the field are identified" do
@@ -448,9 +501,52 @@ class OrderTest < ActiveSupport::TestCase
     assert_not_nil @event
   end
 
-  # TODO: brute_force handles case when num_phones decreases
-  # TODO: brute_force handles case when num_phones increases
+  test "search with blank string returns nothing" do
+    @results = Order.search("")
+    assert_equal [], @results
+  end
 
-  # TODO: re-activating an order assigns phones
-  # TODO: update_data
+  test "search with valid params works" do
+    @results = Order.search("NOT_CURRENT1")
+    assert_equal 1, @results.length
+  end
+
+  test "search with multiple params works" do
+    @results = Order.search("NOT_CURRENT1,PAST2")
+    assert_equal 2, @results.length
+  end
+
+  test "updating data to extend date works" do
+    @order = create_order(orders(:generic))
+    # triggers extend
+    @params[:departure_date] = Date.today + 20
+    @order.update_data(@params)
+    assert Date.today + 20, @order.departure_date
+  end
+
+  test "updating data to increase num_phones triggers assignment" do
+    @order = create_order(orders(:generic)) # num phones: 3
+    @order.brute_force_assign_phones
+    
+    @params[:num_phones] = @order.phones.length + 1
+    @order.update_data(@params)
+    assert_equal 4, @order.phones.length
+  end
+
+  test "updating data to decrease num_phones shrinks phones array" do
+    @order = create_order(orders(:generic)) # num phones: 3
+    @order.brute_force_assign_phones
+    
+    @params[:num_phones] = @order.phones.length - 1
+    @order.update_data(@params)
+    assert_equal 2, @order.phones.length
+  end
+
+  test "updating data tp activate phone assigns all phones" do
+    @order = create_order(orders(:generic)) # num phones: 3
+    
+    @params[:active] = true
+    @order.update_data(@params)
+    assert_equal 3, @order.phones.length
+  end
 end
