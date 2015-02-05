@@ -62,11 +62,17 @@ class PhonesControllerTest < ActionController::TestCase
     # TODO could expand with more tests here
   end
 
-
   test "should check in a phone" do
     post :check_in, :format => :json, inventory_ids: [@phone.inventory_id]
     assert_response :success
     assert_equal assigns(:phones)[0].inventory_id, @phone.inventory_id
+    # TODO could expand with more tests here
+  end
+
+  test "should show current order if one exists" do
+    get :current_order, :format => :json, id: @phone
+    assert_response :success
+    assert assigns(:orders), []
     # TODO could expand with more tests here
   end
 

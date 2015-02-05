@@ -146,4 +146,19 @@ class PhoneTest < ActiveSupport::TestCase
     assert_equal "No phones available", @exception.message
   end
 
+    test "search with blank string returns nothing" do
+    @results = Phone.search("")
+    assert_equal [], @results
+  end
+
+  test "search with valid params works" do
+    @results = Phone.search("Generic")
+    assert_equal 1, @results.length
+  end
+
+  test "search with multiple params works" do
+    @results = Phone.search("2014-11-06,2014-11-07")
+    assert_equal 2, @results.length
+  end
+
 end

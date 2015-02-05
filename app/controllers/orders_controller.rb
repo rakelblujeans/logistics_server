@@ -96,6 +96,7 @@ class OrdersController < ApplicationController
 
   # GET /orders/incoming_on.json
   def incoming_on
+    @data = []
     @data = Order.incoming_on(params[:date])
   end
 
@@ -151,7 +152,7 @@ class OrdersController < ApplicationController
     def set_order
       @order = Order.where(id: params[:id]).first!
     rescue ActiveRecord::RecordNotFound
-      @order = Order.where(invoice_id: params[:id]).first!
+      @order = Order.where(invoice_id: params[:id]).first
     ensure
       if @order
         @is_verified = @order.is_verified
