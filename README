@@ -1,0 +1,1 @@
+Rails backend for Explora's logistics system. db/seeds.rb populates the system with our current list of phones and some dummy orders.
