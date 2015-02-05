@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141103213809) do
+ActiveRecord::Schema.define(version: 20141103213811) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "credit_cards", force: true do |t|
     t.string   "last4"
@@ -23,7 +26,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.integer  "receipts_id"
   end
 
-  add_index "credit_cards", ["receipts_id"], name: "index_credit_cards_on_receipts_id"
+  add_index "credit_cards", ["receipts_id"], name: "index_credit_cards_on_receipts_id", using: :btree
 
   create_table "customers", force: true do |t|
     t.text     "fname"
@@ -38,9 +41,9 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.datetime "updated_at"
   end
 
-  add_index "customers", ["credit_cards_id"], name: "index_customers_on_credit_cards_id"
-  add_index "customers", ["events_id"], name: "index_customers_on_events_id"
-  add_index "customers", ["shipments_id"], name: "index_customers_on_shipments_id"
+  add_index "customers", ["credit_cards_id"], name: "index_customers_on_credit_cards_id", using: :btree
+  add_index "customers", ["events_id"], name: "index_customers_on_events_id", using: :btree
+  add_index "customers", ["shipments_id"], name: "index_customers_on_shipments_id", using: :btree
 
   create_table "delivery_types", force: true do |t|
     t.text     "name"
@@ -49,7 +52,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.integer  "shipments_id"
   end
 
-  add_index "delivery_types", ["shipments_id"], name: "index_delivery_types_on_shipments_id"
+  add_index "delivery_types", ["shipments_id"], name: "index_delivery_types_on_shipments_id", using: :btree
 
   create_table "event_states", force: true do |t|
     t.text "description"
@@ -95,17 +98,17 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.integer  "events_id"
   end
 
-  add_index "orders", ["events_id"], name: "index_orders_on_events_id"
-  add_index "orders", ["receipts_id"], name: "index_orders_on_receipts_id"
-  add_index "orders", ["shipments_id"], name: "index_orders_on_shipments_id"
+  add_index "orders", ["events_id"], name: "index_orders_on_events_id", using: :btree
+  add_index "orders", ["receipts_id"], name: "index_orders_on_receipts_id", using: :btree
+  add_index "orders", ["shipments_id"], name: "index_orders_on_shipments_id", using: :btree
 
   create_table "orders_phones", id: false, force: true do |t|
     t.integer "phone_id", null: false
     t.integer "order_id", null: false
   end
 
-  add_index "orders_phones", ["order_id"], name: "index_orders_phones_on_order_id"
-  add_index "orders_phones", ["phone_id"], name: "index_orders_phones_on_phone_id"
+  add_index "orders_phones", ["order_id"], name: "index_orders_phones_on_order_id", using: :btree
+  add_index "orders_phones", ["phone_id"], name: "index_orders_phones_on_phone_id", using: :btree
 
   create_table "phones", force: true do |t|
     t.integer  "inventory_id"
@@ -121,15 +124,15 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.datetime "updated_at"
   end
 
-  add_index "phones", ["events_id"], name: "index_phones_on_events_id"
+  add_index "phones", ["events_id"], name: "index_phones_on_events_id", using: :btree
 
   create_table "phones_shipments", id: false, force: true do |t|
     t.integer "phone_id",    null: false
     t.integer "shipment_id", null: false
   end
 
-  add_index "phones_shipments", ["phone_id"], name: "index_phones_shipments_on_phone_id"
-  add_index "phones_shipments", ["shipment_id"], name: "index_phones_shipments_on_shipment_id"
+  add_index "phones_shipments", ["phone_id"], name: "index_phones_shipments_on_phone_id", using: :btree
+  add_index "phones_shipments", ["shipment_id"], name: "index_phones_shipments_on_shipment_id", using: :btree
 
   create_table "providers", force: true do |t|
     t.text     "name"
@@ -139,7 +142,7 @@ ActiveRecord::Schema.define(version: 20141103213809) do
     t.integer  "phones_id"
   end
 
-  add_index "providers", ["phones_id"], name: "index_providers_on_phones_id"
+  add_index "providers", ["phones_id"], name: "index_providers_on_phones_id", using: :btree
 
   create_table "receipts", force: true do |t|
     t.integer  "bt_trans_id"
