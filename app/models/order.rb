@@ -94,7 +94,8 @@ class Order < ActiveRecord::Base
     @state_unmatched = EventState.unassigned_inventory
     
     @ids = []
-    @events = Event.group(:order_id).having("max(events.created_at)")
+    @events = Event.group(:order_id, 'events.id')
+      .order("events.created_at DESC")
     @events.each do |event|
       if event.event_state_id == @state_received.id || 
         event.event_state_id == @state_unverified.id ||
@@ -113,7 +114,7 @@ class Order < ActiveRecord::Base
     @state_verified = EventState.order_verified
 
     @ids = []
-    @events = Event.group(:order_id).having("max(events.created_at)")
+    @events = Event.group(:order_id, 'events.id').order("events.created_at DESC")
     @events.each do |event|
       if event.event_state_id == @state_verified.id
         @ids << event.order_id
@@ -145,7 +146,7 @@ class Order < ActiveRecord::Base
     @in_date_bracket = Date.today + 1
     @received_phone_ids = Event.filter_phone_events(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
     # these are phones out in the field, due today
-    @orders = Order.joins(:phones).where(id: @order_ids).group(:order_id)
+    @orders = Order.joins(:phones).where(id: @order_ids).group('orders.id')
     @orders.each do |order|
       # subtract phones that have already been checked back in
       @incoming_phones = Array.new(order.phones.all)
@@ -168,7 +169,8 @@ class Order < ActiveRecord::Base
     @event_order_verified = EventState.order_verified
     @estate_delivered = EventState.inventory_delivered
     @order_ids = []
-    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
+    @events = Event.joins(:order).group(:order_id, 'events.id')
+      .order("events.created_at DESC")
 
     @events.each do |event|
       if event.event_state_id == @event_order_verified.id ||
@@ -178,9 +180,9 @@ class Order < ActiveRecord::Base
     end
     
     @data = []
-    @outbound_orders = Order.joins(:phones).group(:order_id)
+    @outbound_orders = Order.joins(:phones).group('orders.id')
     .where(id: @order_ids)
-    .where('arrival_date == DATE(?)', @real_date).all
+    .where('arrival_date = DATE(?)', @real_date).all
     @outbound_orders.each do |order|
       @unshipped_phones = Array.new(order.phones.all)
       order.shipments.each do |shipment|
@@ -212,9 +214,9 @@ class Order < ActiveRecord::Base
   end
 
   def self.overdue_shipping
-    @events = Event.joins(:order).group(:order_id)
-    .having("max(events.created_at)")
-    .where("date(arrival_date, '-? days') < DATE(?)", 
+    @events = Event.joins(:order).group(:order_id, 'events.id')
+    .order("events.created_at DESC")
+    .where("arrival_date - INTERVAL '? days' < DATE(?)", 
       Rails.configuration.delivery_transit_time_sending,
       Date.today)
 
@@ -230,9 +232,9 @@ class Order < ActiveRecord::Base
   end
 
   def self.overdue
-    @events = Event.joins(:order).group(:order_id)
-    .having("max(events.created_at)")
-    .where("date(departure_date, '+? days') < DATE(?)", 
+    @events = Event.joins(:order).group(:order_id, 'events.id')
+    .order("events.created_at DESC")
+    .where("departure_date + INTERVAL '? days' < DATE(?)",
       Rails.configuration.delivery_transit_time_return,
       Date.today)
     
@@ -270,8 +272,8 @@ class Order < ActiveRecord::Base
     @state_inventory_sent = EventState.inventory_delivered
 
     # orders currently out
-    @events = Event.joins(:order).group(:order_id).having("max(events.created_at)")
-    .where("date(arrival_date, '-? days') <= DATE(?) AND date(departure_date, '+? days') >= DATE(?)", 
+    @events = Event.joins(:order).group(:order_id, 'events.id').order("events.created_at DESC")
+    .where("arrival_date - INTERVAL '? days' <= DATE(?) AND departure_date + INTERVAL '? days' >= DATE(?)", 
       Rails.configuration.delivery_transit_time_sending,
       @today, 
       Rails.configuration.delivery_transit_time_return,
@@ -299,7 +301,8 @@ class Order < ActiveRecord::Base
       date2 = date2.strftime("%Y-%m-%d")
     end
 
-    @orders = Order.where("(DATE(?) <= date(arrival_date, '-? days') AND date(arrival_date, '-? days') < DATE(?)) OR (DATE(?) <= date(departure_date, '+? days') AND date(departure_date, '+? days') < DATE(?))",
+    #.where("arrival_date - INTERVAL '? days' <= DATE(?) AND departure_date + INTERVAL '? days' >= DATE(?)", 
+      @orders = Order.where("(DATE(?) <= arrival_date - INTERVAL '? days' AND arrival_date - INTERVAL '? days' < DATE(?)) OR (DATE(?) <= departure_date + INTERVAL '? days' AND departure_date + INTERVAL '? days' < DATE(?))",
       date1, Rails.configuration.delivery_transit_time_sending,
       Rails.configuration.delivery_transit_time_sending, date2, 
       date1, Rails.configuration.delivery_transit_time_return,
