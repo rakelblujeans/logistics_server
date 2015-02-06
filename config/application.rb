@@ -39,5 +39,7 @@ module LogisticsServer
     config.delivery_transit_time_return = 3
     # warn about orders with missing phones within this many days out from now
     config.missing_phones_window = 90
+
+    config.filter_parameters += [:password, :name]
   end
 end
