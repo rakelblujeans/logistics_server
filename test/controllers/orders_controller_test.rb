@@ -10,7 +10,7 @@ class OrdersControllerTest < ActionController::TestCase
   end
 
   test "should get index" do
-    get :index, :format => :json
+    get :index, :format => :json, 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(users(:admin).name, users(:admin).password)
     assert_response :success
     assert_not_nil assigns(:orders)
   end
