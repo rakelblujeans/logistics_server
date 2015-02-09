@@ -105,10 +105,11 @@ class Phone < ActiveRecord::Base
     @terms = query_string.split(",")
     @terms.each do |term|
       term = "%#{term}%"
+      # TODO: search by
+      # inventory_id
       @phones = 
-        Phone.where('inventory_id like ? OR MEID like ? OR ICCID like ? OR 
-          phone_num like ? OR notes like ? OR last_imaged like ?',
-          term, term, term, term, term, term).all
+        Phone.where('"MEID" ILIKE ? or "ICCID" ILIKE ? or phone_num ILIKE ? or notes ILIKE ?',
+          term, term, term, term).all
       @phones
       @final_list = @final_list + @phones
     end
@@ -119,14 +120,14 @@ class Phone < ActiveRecord::Base
 #############
 
   def past_orders
-    @past_orders = self.orders.where("date(departure_date, '+? days') < DATE(?)", 
+    @past_orders = self.orders.where("departure_date + INTERVAL '? days' < DATE(?)", 
       Rails.configuration.delivery_transit_time_return, Date.today)
     @past_orders
   end
 
   def last_order
     @last_order = self.orders
-      .where("date(departure_date, '+? days') < DATE(?)", 
+      .where("departure_date + INTERVAL '? days' < DATE(?)", 
         Rails.configuration.delivery_transit_time_return, Date.today)
       .order(created_at: :desc)
       .first
@@ -134,7 +135,7 @@ class Phone < ActiveRecord::Base
   end
 
   def upcoming_orders
-    @upcoming_orders = self.orders.where("date(arrival_date, '-? days') >= DATE(?)", 
+    @upcoming_orders = self.orders.where("arrival_date - INTERVAL '? days' >= DATE(?)", 
       Rails.configuration.delivery_transit_time_sending, Date.today)
     @upcoming_orders
   end
@@ -142,7 +143,7 @@ class Phone < ActiveRecord::Base
   def current_order
     @today = Date.today
     @order = self.orders.where(
-      "date(arrival_date, '-? days') <= DATE(?) AND date(departure_date, '+? days') > DATE(?)", 
+      "arrival_date - INTERVAL '? days' <= DATE(?) AND departure_date + INTERVAL '? days' > DATE(?)",
       Rails.configuration.delivery_transit_time_sending, @today, 
       Rails.configuration.delivery_transit_time_return, @today).first!
     @order

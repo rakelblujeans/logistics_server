@@ -8,7 +8,6 @@ class HomeController < ApplicationController
 
   	# pull order info
   	@orders = Order.search(params[:q])
-
   end
 
 end
