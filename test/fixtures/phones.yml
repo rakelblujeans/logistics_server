@@ -12,7 +12,7 @@ generic:
 
 one:
   inventory_id: 1
-  MEID: MyText
+  MEID: MyTextOne
   ICCID: MyText
   phone_num: MyText
   notes: MyText
@@ -23,7 +23,7 @@ one:
 two:
   inventory_id: 2
   MEID: MyText
-  ICCID: MyText
+  ICCID: MyTextTwo
   phone_num: MyText
   notes: MyText
   last_imaged: 2014-11-07

@@ -1,8 +1,6 @@
 class Order < ActiveRecord::Base
-  belongs_to :customer
   has_many :shipments
   has_and_belongs_to_many :phones
-  has_many :receipts
   has_many :events
 
   def self.date?(obj)
@@ -61,10 +59,6 @@ class Order < ActiveRecord::Base
         @order = Order.new(order_params)
         @order.save
 
-        # TODO: create customer
-        # TODO: create receipt
-        # TODO: create credit card
-
         @state = EventState.order_received
         @event = Event.create(
           event_state: @state,
@@ -94,8 +88,7 @@ class Order < ActiveRecord::Base
     @state_unmatched = EventState.unassigned_inventory
     
     @ids = []
-    @events = Event.group(:order_id, 'events.id')
-      .order("events.created_at DESC")
+    @events = Event.latest_per_order
     @events.each do |event|
       if event.event_state_id == @state_received.id || 
         event.event_state_id == @state_unverified.id ||
@@ -104,9 +97,9 @@ class Order < ActiveRecord::Base
         @ids << event.order_id
       end
     end
-
+    #puts "**** All UNVERIFIED order ids #{@ids.inspect}"
     @active_orders = Order.where(active: true)
-    @orders = @active_orders.find(@ids)
+    @orders = @active_orders.where(id:[@ids]);
   end
 
   # gets list of all unverified orders
@@ -114,15 +107,16 @@ class Order < ActiveRecord::Base
     @state_verified = EventState.order_verified
 
     @ids = []
-    @events = Event.group(:order_id, 'events.id').order("events.created_at DESC")
+    @events = Event.latest_per_order
     @events.each do |event|
       if event.event_state_id == @state_verified.id
         @ids << event.order_id
       end
     end
 
+    #puts "**** All verified order ids  #{self.ids.inspect}"
     @active_orders = Order.where(active: true)
-    @orders = @active_orders.find(@ids)
+    @orders = @active_orders.where(id:[@ids]);
   end
 
   # what phones arrive in our office on this date?
@@ -169,9 +163,9 @@ class Order < ActiveRecord::Base
     @event_order_verified = EventState.order_verified
     @estate_delivered = EventState.inventory_delivered
     @order_ids = []
-    @events = Event.joins(:order).group(:order_id, 'events.id')
-      .order("events.created_at DESC")
-
+    #@events = Event.joins(:order).group(:order_id, 'events.id')
+    #  .order("events.created_at DESC")
+    @events = Event.latest_per_order
     @events.each do |event|
       if event.event_state_id == @event_order_verified.id ||
         event.event_state_id == @estate_delivered.id
@@ -214,9 +208,10 @@ class Order < ActiveRecord::Base
   end
 
   def self.overdue_shipping
-    @events = Event.joins(:order).group(:order_id, 'events.id')
-    .order("events.created_at DESC")
-    .where("arrival_date - INTERVAL '? days' < DATE(?)", 
+    #Event.joins(:order).group(:order_id, 'events.id')
+    #.order("events.created_at DESC")
+    @events = Event.latest_per_order.joins(:order) 
+    .where("orders.arrival_date - INTERVAL '? days' < DATE(?)", 
       Rails.configuration.delivery_transit_time_sending,
       Date.today)
 
@@ -232,11 +227,13 @@ class Order < ActiveRecord::Base
   end
 
   def self.overdue
-    @events = Event.joins(:order).group(:order_id, 'events.id')
-    .order("events.created_at DESC")
-    .where("departure_date + INTERVAL '? days' < DATE(?)",
+    #@events.joins(:order).where("departure_date + INTERVAL '? days' < DATE(?)",
+    #  Rails.configuration.delivery_transit_time_return,
+    #  Date.today)
+    @events = Event.latest_per_order.joins(:order)
+      .where("orders.departure_date + INTERVAL '? days' < DATE(?)",
       Rails.configuration.delivery_transit_time_return,
-      Date.today)
+      Date.today)    
     
     @ids = []
     @state_inventory_sent = EventState.inventory_delivered
@@ -272,8 +269,9 @@ class Order < ActiveRecord::Base
     @state_inventory_sent = EventState.inventory_delivered
 
     # orders currently out
-    @events = Event.joins(:order).group(:order_id, 'events.id').order("events.created_at DESC")
-    .where("arrival_date - INTERVAL '? days' <= DATE(?) AND departure_date + INTERVAL '? days' >= DATE(?)", 
+    #Event.joins(:order).group(:order_id, 'events.id').order("events.created_at DESC")
+    @events = Event.latest_per_order.joins(:order)
+      .where("orders.arrival_date - INTERVAL '? days' <= DATE(?) AND orders.departure_date + INTERVAL '? days' >= DATE(?)", 
       Rails.configuration.delivery_transit_time_sending,
       @today, 
       Rails.configuration.delivery_transit_time_return,
@@ -302,7 +300,7 @@ class Order < ActiveRecord::Base
     end
 
     #.where("arrival_date - INTERVAL '? days' <= DATE(?) AND departure_date + INTERVAL '? days' >= DATE(?)", 
-      @orders = Order.where("(DATE(?) <= arrival_date - INTERVAL '? days' AND arrival_date - INTERVAL '? days' < DATE(?)) OR (DATE(?) <= departure_date + INTERVAL '? days' AND departure_date + INTERVAL '? days' < DATE(?))",
+      @orders = Order.where("(DATE(?) <= orders.arrival_date - INTERVAL '? days' AND orders.arrival_date - INTERVAL '? days' < DATE(?)) OR (DATE(?) <= orders.departure_date + INTERVAL '? days' AND orders.departure_date + INTERVAL '? days' < DATE(?))",
       date1, Rails.configuration.delivery_transit_time_sending,
       Rails.configuration.delivery_transit_time_sending, date2, 
       date1, Rails.configuration.delivery_transit_time_return,
@@ -319,13 +317,13 @@ def self.search(query_string)
   @terms.each do |term|
     term = "%#{term}%"
     # TODO: not working in psql:
-    #invoice_id like ? OR , arrival_date, departure_date
+    # arrival_date, departure_date
     @orders = 
-      Order.where('full_address ILIKE ? OR shipping_name ILIKE ? OR shipping_city ILIKE ? 
+      Order.where('invoice_id ILIKE ? or full_address ILIKE ? OR shipping_name ILIKE ? OR shipping_city ILIKE ? 
         OR shipping_state ILIKE ? OR shipping_zip ILIKE ? OR shipping_country ILIKE ? 
         OR shipping_apt_suite ILIKE ? OR shipping_notes ILIKE ? 
         OR language ILIKE ?',
-        term, term, term, term, term, term, term, term, term).all
+        term, term, term, term, term, term, term, term, term, term).all
     @orders
     @final_list = @final_list + @orders
   end
@@ -457,9 +455,11 @@ end
     @in_date_bracket = (Time.now.utc + 1.day).midnight
     @state_inventory_received = EventState.received_inventory
     @received_phone_ids = Event.filter_phone_events(@state_inventory_received, @in_date_bracket).pluck(:phone_id)
+
     # subtract phones that have already been checked back in
     @incoming_phones = Array.new(self.phones.all)
     @incoming_phones.delete_if { |phone| @received_phone_ids.include? phone.id }
+    #puts "\n **** STILL OUT ***** #{@incoming_phones}"
     @incoming_phones
   end
 

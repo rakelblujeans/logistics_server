@@ -4,10 +4,6 @@ Rails.application.routes.draw do
   get 'home/index'
   get 'home/search'
 
-  resources :credit_cards
-
-  resources :customers
-
   resources :delivery_types
 
   resources :events
@@ -40,8 +36,6 @@ Rails.application.routes.draw do
   resources :phones
 
   resources :providers
-
-  resources :receipts
 
   resources :shipments
   

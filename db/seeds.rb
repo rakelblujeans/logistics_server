@@ -83,18 +83,6 @@
 	{inventory_id: '47', MEID: '35258406252729', ICCID: '89011200000277619200', phone_num: '336-486-8443', last_imaged: '2014-10-30', provider:@p1, active: true},
 	{inventory_id: '48', MEID: '35258406252706', provider:@p2},
 ])
-=begin
-@customer1 = Customer.create({
-	fname: 'test1_first', 
-	lname: 'test1_last', 
-	email: 'test@gmail.com', 
-	active: true})
-=end
-@customer2 = Customer.create({
-	fname: 'test1_first', 
-	lname: 'test1_last', 
-	email: 'test@gmail.com', 
-	active: true})
 
 # estimated time spent in transit during delivery
 @lead_time = Rails.configuration.delivery_transit_time_sending
@@ -115,7 +103,6 @@
 	departure_date: Date.today - 7,
 	language: 'en',
 	num_phones: 1,
-	#customer: @customer1,
 	active: true
 	})
 @order6.brute_force_assign_phones
@@ -148,7 +135,6 @@
 	departure_date: Date.today - 3,
 	language: 'en',
 	num_phones: 2,
-	#customer: @customer1,
 	active: true
 	})
 @order2.brute_force_assign_phones
@@ -180,7 +166,6 @@
 	departure_date: Date.today + 5,
 	language: 'en',
 	num_phones: 1,
-	#customer: @customer2,
 	active: true
 	})
 @order7.brute_force_assign_phones
@@ -202,7 +187,6 @@
 	departure_date: Date.today + 7,
 	language: 'en',
 	num_phones: 3,
-	#customer: @customer2,
 	active: true
 	})
 @order1.brute_force_assign_phones
@@ -224,7 +208,6 @@
 	departure_date: Date.today + 7,
 	language: 'en',
 	num_phones: 4,
-	#customer: @customer1,
 	active: true
 	})
 @order3.brute_force_assign_phones
@@ -254,7 +237,6 @@
 	departure_date: Date.today + 20,
 	language: 'en',
 	num_phones: 4,
-	#customer: @customer2,
 	active: true
 	})
 @order5.brute_force_assign_phones
@@ -275,33 +257,7 @@
 	departure_date: Date.today + 14,
 	language: 'en',
 	num_phones: 4,
-	#customer: @customer1,
 	active: true
 	})
 @order4.brute_force_assign_phones
 @order4.phones.delete(@order4.phones[0])
-
-
-=begin
-@card1 = CreditCard.create({last4:'1234', bt_id: 'X123Z02', customer: @c1, active: true});
-
-@receipt = Receipt.create({
-	bt_trans_id: '123XYZ',
-	discount_code: '15teen',
-	shipping_string: '123 Main St, Brooklynm, NY 12345',
-	referral_code: 'mr smith',
-	rental_charge: 34.45,
-	shipping_charge: 10.00,
-	rental_discount: 1.23,
-	tax_charge: 5.00,
-	payment_amount: 402.34,
-	payment_date: '2014-01-01',
-	payment_status: 'submitted',
-	discount_string: 'discount yarrrr',
-	last_4_digits: '1234',
-	refunded: false,
-	order: @order1,
-	credit_card: @card1,
-	active: true
-	})
-=end

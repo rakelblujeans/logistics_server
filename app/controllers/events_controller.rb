@@ -75,6 +75,6 @@ class EventsController < ApplicationController
     def event_params
       #logger.debug("PARAMSSS #{params.inspect}")
       params.require(:event).permit(:id, :created_at, :updated_at, 
-        :customer_id, :order_id, :phone_id, :event_state_id)
+        :order_id, :phone_id, :event_state_id)
     end
 end

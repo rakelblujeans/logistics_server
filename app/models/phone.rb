@@ -64,7 +64,7 @@ class Phone < ActiveRecord::Base
     in_end = in_end.strftime("%Y-%m-%d")
 
     @orders = Order.where(active: true)        
-    @used_phone_ids = @orders.joins(:phones).where("departure_date >= DATE(?) AND departure_date < DATE(?)", in_start, in_end).pluck(:phone_id)
+    @used_phone_ids = @orders.joins(:phones).where("orders.departure_date >= DATE(?) AND orders.departure_date < DATE(?)", in_start, in_end).pluck(:phone_id)
 
     # return the complement of that set
     #puts "\nCURRENTLY USED PHONES: #{@used_phone_ids.inspect} BETWEEN #{in_start} #{in_end}"

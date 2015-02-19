@@ -157,7 +157,13 @@ class PhoneTest < ActiveSupport::TestCase
   end
 
   test "search with multiple params works" do
-    @results = Phone.search("2014-11-06,2014-11-07")
+    @phone1 = create_phone(phones(:one))
+    @phone2 = create_phone(phones(:two))
+    # clear all other phones
+    @other_phones = Phone.where.not(id:[@phone1.id, @phone2.id])
+    @other_phones.destroy_all
+
+    @results = Phone.search("MyTextOne,MyTextTwo")
     assert_equal 2, @results.length
   end
 

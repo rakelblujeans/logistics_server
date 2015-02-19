@@ -28,18 +28,6 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table :customers do |t|
-      t.text :fname
-      t.text :lname
-      t.text :email
-      t.text :bt_id
-      t.boolean :active
-      t.references :shipments, index: true
-      t.references :credit_cards, index: true
-      t.references :events, index: true
-      t.timestamps
-    end
-
     # as it comes in from external source (website)
     create_table :orders do |t|
       t.text :invoice_id
@@ -58,9 +46,7 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
       t.integer :num_phones
       t.boolean :active
       t.timestamps
-      t.belongs_to :customer
       t.references :shipments, index: true
-      t.references :receipts, index: true
       t.references :events, index: true
     end
 
@@ -100,42 +86,11 @@ class CreatePhonesOrdersShipments < ActiveRecord::Migration
     end
 
     create_table :events do |t|
-      t.belongs_to :customer
       t.belongs_to :order
       t.belongs_to :phone
       t.belongs_to :event_state
       t.timestamps
     end
 
-    create_table :credit_cards do |t|
-      t.string :last4
-      t.string :bt_id
-      t.boolean :active
-      t.belongs_to :customer
-      t.timestamps
-      t.references :receipts, index: true
-    end
-
-    create_table :receipts do |t|
-      t.integer :bt_trans_id
-      t.text :discount_code
-      t.text :shipping_string
-      t.text :referral_code
-      t.decimal :rental_charge
-      t.decimal :shipping_charge
-      t.decimal :rental_discount
-      t.decimal :tax_charge
-      t.decimal :payment_amount
-      t.date :payment_date
-      t.integer :payment_status
-      t.text :discount_string
-      t.text :last_4_digits
-      t.boolean :refunded
-      t.boolean :active
-      t.timestamps
-      t.belongs_to :order
-      t.belongs_to :credit_card
-    end
-    
   end
 end

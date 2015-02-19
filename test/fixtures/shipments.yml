@@ -5,7 +5,7 @@ incoming_today:
   hand_delivered_by: Raquel
   delivery_return_code: 456
   qty: 1
-  active: 1
+  active: true
   out_on_date: <%= Date.today - 10 %>
   order_id:
   delivery_type:
@@ -15,7 +15,7 @@ not_incoming_today:
   hand_delivered_by: Raquel
   delivery_return_code: 456
   qty: 1
-  active: 1
+  active: true
   out_on_date: <%= Date.today + 1 %>
   order_id:
   delivery_type:
@@ -25,7 +25,7 @@ outbound_today:
   hand_delivered_by: Raquel2
   delivery_return_code: 789
   qty: 1
-  active: 1
+  active: true
   out_on_date: <%= Date.today %>
   order_id:
   delivery_type:
@@ -35,7 +35,7 @@ generic:
   hand_delivered_by: Raquel2
   delivery_return_code: 789
   qty: 1
-  active: 1
+  active: true
   out_on_date: <%= Date.today %>
   order_id:
   delivery_type:

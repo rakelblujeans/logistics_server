@@ -16,35 +16,6 @@ ActiveRecord::Schema.define(version: 20141103213811) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "credit_cards", force: true do |t|
-    t.string   "last4"
-    t.string   "bt_id"
-    t.boolean  "active"
-    t.integer  "customer_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "receipts_id"
-  end
-
-  add_index "credit_cards", ["receipts_id"], name: "index_credit_cards_on_receipts_id", using: :btree
-
-  create_table "customers", force: true do |t|
-    t.text     "fname"
-    t.text     "lname"
-    t.text     "email"
-    t.text     "bt_id"
-    t.boolean  "active"
-    t.integer  "shipments_id"
-    t.integer  "credit_cards_id"
-    t.integer  "events_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "customers", ["credit_cards_id"], name: "index_customers_on_credit_cards_id", using: :btree
-  add_index "customers", ["events_id"], name: "index_customers_on_events_id", using: :btree
-  add_index "customers", ["shipments_id"], name: "index_customers_on_shipments_id", using: :btree
-
   create_table "delivery_types", force: true do |t|
     t.text     "name"
     t.datetime "created_at"
@@ -59,7 +30,6 @@ ActiveRecord::Schema.define(version: 20141103213811) do
   end
 
   create_table "events", force: true do |t|
-    t.integer  "customer_id"
     t.integer  "order_id"
     t.integer  "phone_id"
     t.integer  "event_state_id"
@@ -92,14 +62,11 @@ ActiveRecord::Schema.define(version: 20141103213811) do
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "customer_id"
     t.integer  "shipments_id"
-    t.integer  "receipts_id"
     t.integer  "events_id"
   end
 
   add_index "orders", ["events_id"], name: "index_orders_on_events_id", using: :btree
-  add_index "orders", ["receipts_id"], name: "index_orders_on_receipts_id", using: :btree
   add_index "orders", ["shipments_id"], name: "index_orders_on_shipments_id", using: :btree
 
   create_table "orders_phones", id: false, force: true do |t|
@@ -143,28 +110,6 @@ ActiveRecord::Schema.define(version: 20141103213811) do
   end
 
   add_index "providers", ["phones_id"], name: "index_providers_on_phones_id", using: :btree
-
-  create_table "receipts", force: true do |t|
-    t.integer  "bt_trans_id"
-    t.text     "discount_code"
-    t.text     "shipping_string"
-    t.text     "referral_code"
-    t.decimal  "rental_charge"
-    t.decimal  "shipping_charge"
-    t.decimal  "rental_discount"
-    t.decimal  "tax_charge"
-    t.decimal  "payment_amount"
-    t.date     "payment_date"
-    t.integer  "payment_status"
-    t.text     "discount_string"
-    t.text     "last_4_digits"
-    t.boolean  "refunded"
-    t.boolean  "active"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "order_id"
-    t.integer  "credit_card_id"
-  end
 
   create_table "shipments", force: true do |t|
     t.text     "delivery_out_code"
